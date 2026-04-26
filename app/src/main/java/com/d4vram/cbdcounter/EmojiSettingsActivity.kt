@@ -22,6 +22,23 @@ class EmojiSettingsActivity : AppCompatActivity() {
     private lateinit var adapter: EmojiRangeAdapter
     private lateinit var resetButton: MaterialButton
 
+    private val restoreBackupLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) {
+            try {
+                if (BackupManager.restoreBackup(this, uri)) {
+                    android.widget.Toast.makeText(this, "Backup restaurado correctamente", android.widget.Toast.LENGTH_LONG).show()
+                    // Recargar datos visuales si es necesario o reiniciar app
+                    setResult(RESULT_OK)
+                    finish() // Cerrar para obligar a recargar MainActivity al volver
+                } else {
+                    android.widget.Toast.makeText(this, "Error al restaurar backup (formato inválido)", android.widget.Toast.LENGTH_LONG).show()
+                }
+            } catch (e: Exception) {
+                android.widget.Toast.makeText(this, "Error: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
     // Lista de rangos con sus emojis por defecto
     private val emojiRanges = listOf(
         EmojiRange(0, "😌", R.color.green_safe, "0"),
@@ -41,6 +58,9 @@ class EmojiSettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_emoji_settings)
 
+        // Configurar color de la barra de estado
+        window.statusBarColor = ContextCompat.getColor(this, R.color.gradient_start)
+
         // Configurar toolbar
         val toolbar = findViewById<MaterialToolbar>(R.id.settingsToolbar)
         toolbar.setNavigationOnClickListener { finish() }
@@ -57,11 +77,63 @@ class EmojiSettingsActivity : AppCompatActivity() {
         }
         recyclerView.adapter = adapter
 
+        // Configurar Toggle Sintonía (CBD/THC)
+        val substanceToggle = findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.substanceToggleGroup)
+        val currentSubstance = Prefs.getSubstanceType(this)
+        
+        if (currentSubstance == "THC") {
+            substanceToggle.check(R.id.btnThc)
+        } else {
+            substanceToggle.check(R.id.btnCbd)
+        }
+
+        substanceToggle.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked) {
+                val type = if (checkedId == R.id.btnThc) "THC" else "CBD"
+                Prefs.setSubstanceType(this, type)
+                // TODO: Apply Color Theme changes if necessary immediately or show toast
+            }
+        }
+
         // Configurar botón de reset
         resetButton = findViewById(R.id.resetButton)
         resetButton.setOnClickListener {
             showResetConfirmationDialog()
         }
+
+        // ---- BACKUP UI ----
+        val btnCreateBackup = findViewById<MaterialButton>(R.id.btnCreateBackup)
+        val btnRestoreBackup = findViewById<MaterialButton>(R.id.btnRestoreBackup)
+        val checkEncrypt = findViewById<android.widget.CheckBox>(R.id.checkBackupEncrypt)
+
+        btnCreateBackup.setOnClickListener {
+            // TODO: Handle encryption if checkEncrypt.isChecked
+            val backupFile = BackupManager.createBackup(this)
+            if (backupFile != null) {
+                shareBackupFile(backupFile)
+            } else {
+                android.widget.Toast.makeText(this, "Error al crear backup", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        btnRestoreBackup.setOnClickListener {
+            android.widget.Toast.makeText(this, "Restauración pendiente de implementar", android.widget.Toast.LENGTH_SHORT).show()
+            // TODO: Pick file intent -> BackupManager.restoreBackup
+        }
+    }
+
+    private fun shareBackupFile(file: java.io.File) {
+        val uri = androidx.core.content.FileProvider.getUriForFile(
+            this,
+            "$packageName.fileprovider",
+            file
+        )
+        val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+            type = "application/zip"
+            putExtra(android.content.Intent.EXTRA_STREAM, uri)
+            addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        startActivity(android.content.Intent.createChooser(shareIntent, "Compartir Backup"))
     }
 
     /**

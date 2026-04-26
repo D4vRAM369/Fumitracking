@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Handle -->
+    <View
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="20dp"
+        android:background="@color/m3_outline" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="¿Con qué está aliñado el CBD?"
+        style="?attr/textAppearanceHeadlineSmall"
+        android:textColor="@color/m3_on_surface"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Etiqueta la toma con vibra 420."
+        style="?attr/textAppearanceBodyMedium"
+        android:alpha="0.6"
+        android:textColor="@color/m3_on_surface"
+        android:layout_marginBottom="24dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnWeed"
+        style="@style/Widget.Material3.Button"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:text="🌿 weed"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        app:backgroundTint="@color/m3_secondary"
+        app:cornerRadius="26dp"
+        android:layout_marginBottom="12dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnPolen"
+        style="@style/Widget.Material3.Button"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:text="🐝 polen"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        app:backgroundTint="@color/polen_amber"
+        app:cornerRadius="26dp"
+        android:layout_marginBottom="8dp" />
+
+</LinearLayout>

@@ -42,7 +42,7 @@
     <color name="io_action_icon_tint">@color/text_primary</color>
 
     <!-- Colores para el gradient_header -->
-    <color name="gradient_start">#6B46C1</color>  <!-- antes  este morado en la v1.0-->
+    <color name="gradient_start">#6750A4</color>  <!-- M3 Primary light -->
     <color name="gradient_end">#9F7AEA</color>
 
     <!-- Colores para el modal 420 y el chip aliñado -->
@@ -57,5 +57,63 @@
     <color name="calendar_today_fill">#33667EEA</color>
     <color name="calendar_today_stroke">#667eea</color>
     <color name="calendar_header_text">#6B7280</color>
+
+    <!-- Colores THC (Verde hierba) -->
+    <color name="thc_primary">#4CAF50</color>
+    <color name="thc_primary_dark">#388E3C</color>
+    <color name="thc_primary_light">#81C784</color>
+    <color name="thc_accent">#A5D6A7</color>
+    <color name="thc_chip_background">#E8F5E9</color>
+    <color name="thc_text">#2E7D32</color>
+    <color name="thc_weed_orange">#4CAF50</color>
+    <color name="thc_weed_outline">#81C784</color>
+
+    <!-- Colores CBD (Azul) para chips -->
+    <color name="cbd_chip_background">#E3F2FD</color>
+    <color name="cbd_text">#1565C0</color>
+
+    <!-- ===== M3 Semantic tokens — LIGHT (día) ===== -->
+    <!-- Primary: violeta M3 -->
+    <color name="m3_primary">#6750A4</color>
+    <color name="m3_on_primary">#FFFFFF</color>
+    <color name="m3_primary_container">#EADDFF</color>
+    <color name="m3_on_primary_container">#21005D</color>
+
+    <!-- Secondary: CBD verde -->
+    <color name="m3_secondary">#4CAF50</color>
+    <color name="m3_on_secondary">#FFFFFF</color>
+    <color name="m3_secondary_container">#C8E6C9</color>
+    <color name="m3_on_secondary_container">#1B5E20</color>
+
+    <!-- Tertiary: THC púrpura -->
+    <color name="m3_tertiary">#7B1FA2</color>
+    <color name="m3_on_tertiary">#FFFFFF</color>
+    <color name="m3_tertiary_container">#E1BEE7</color>
+    <color name="m3_on_tertiary_container">#4A148C</color>
+
+    <!-- Surface LIGHT (valores correctos para modo día) -->
+    <color name="m3_surface">#FFFBFE</color>
+    <color name="m3_surface_variant">#E7E0EC</color>
+    <color name="m3_on_surface">#1C1B1F</color>
+    <color name="m3_on_surface_variant">#49454F</color>
+    <color name="m3_outline">#79747E</color>
+
+    <!-- ===== Dashboard cards — ME3 Expressive LIGHT ===== -->
+    <!-- Hoy: azul cielo -->
+    <color name="card_today_bg">#DBEAFE</color>
+    <color name="card_today_value">#1D4ED8</color>
+    <!-- Semana: naranja cálido -->
+    <color name="card_week_bg">#FFEDD5</color>
+    <color name="card_week_value">#C2410C</color>
+    <!-- Promedio: verde lima -->
+    <color name="card_avg_bg">#D1FAE5</color>
+    <color name="card_avg_value">#065F46</color>
+    <!-- Racha: lavanda suave -->
+    <color name="card_streak_bg">#EDE9FE</color>
+    <color name="card_streak_value">#6D28D9</color>
+
+    <!-- Polen ámbar -->
+    <color name="polen_amber">#FF8F00</color>
+    <color name="polen_amber_container">#FFF3E0</color>
 
 </resources>

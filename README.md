@@ -1,118 +1,188 @@
+# 🌿 CBD & THC Counter
 
-## CBDcounter
-[English version](README_english-version.md)
-
-**Contador minimalista de CBD para Android.**
+> Personal harm-reduction tracker for CBD and THC intake — built with Kotlin & Material Expressive 3.
 
 <img width="512" height="512" alt="icono_cbdcounter2_cleaned" src="https://github.com/user-attachments/assets/0d6eff86-af54-4a67-a132-9e63a87eef40" />
 
-
-[![release](https://img.shields.io/github/v/release/D4vRAM369/CBDcounter?label=release)](https://github.com/D4vRAM369/CBDcounter/releases)
+[![Version](https://img.shields.io/badge/version-1.5-6750A4?style=flat-square)](https://github.com/d4vram/CBDcounter2/releases/tag/v1.5)
+[![Android](https://img.shields.io/badge/Android-8.0%2B-green?style=flat-square&logo=android)](https://developer.android.com)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7B68EE?style=flat-square&logo=kotlin)](https://kotlinlang.org)
 [![license](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
 ![minSdk](https://img.shields.io/badge/minSdk-24+-informational)
 ![targetSdk](https://img.shields.io/badge/targetSdk-35-informational)
 <img src="https://img.shields.io/badge/ClaudeCode_&_PBL-powered-4B0082?style=flat-square&logo=anthropic&logoColor=white"/>
-<img src="https://img.shields.io/badge/Gemini_3_Pro-powered-8E75B2?style=flat-square&logo=googlegemini&logoColor=white"/>
-<img src="https://img.shields.io/badge/Antigravity_IDE-powered-FF6D00?style=flat-square&logo=google&logoColor=white"/>
-<img src="https://img.shields.io/badge/ChatGPT-powered-74aa9c?style=flat-square&logo=openai&logoColor=white"/>
 <img src="https://img.shields.io/badge/Project--Based_Learning-driven-orange?style=flat-square"/>
 <img src="https://img.shields.io/badge/ABP-metodología-blue?style=flat-square"/>
 ![privacy](https://img.shields.io/badge/privacy-100%25%20local-success)
 
----
-
-> 📢 **Novedad — v1.2 ya disponible (21/11/2025)**  
-> Versión centrada en perfeccionar el Widget, unificar la UI y mejorar la estabilidad.
->
-> 🟢 **Novedades principales:**
-> - **Widget 2.0**: Nuevo diseño 2x2 con botones cuadrados y emojis unificados (🌿/🍫).
-> - **Notas Inteligentes**: Formato automático con timestamp y opción de "Mantener Nota" al restar.
-> - **Mejoras Visuales**: Chips Material Design y transiciones suaves sin parpadeos.
-> - **Correcciones**: Solucionados crashes críticos y bugs de duplicación en el widget.
-> - Privacidad total: **cero datos enviados**, **sin anuncios**, **sin analytics**.
-
-🔗 **Descarga v1.2:**  
-👉 [Ver Release oficial (v1.2)](https://github.com/D4vRAM369/CBDcounter/releases/tag/v1.2)
-
-🛡️ **Política de Privacidad:**  
-[https://d4vram369.github.io/CBDcounter/privacy.html](https://d4vram369.github.io/CBDcounter/privacy.html)
+**[🇪🇸 Versión en español](README_spanish-version.md)**
 
 ---
 
-CBDcounter empezó como otro proyecto más para uso personal, que no tenía intención de subir o publicar, pero ayer por la tarde pensé *"¿Por qué no?"*.
+## What is this?
 
-Interfaz simple y minimalista. Además del funcionamiento dentro de la propia app, también permite registrar rápidamente las tomas mediante un widget agregado a pantalla de inicio, y visualizar la evolución de ese día. 
+CBD & THC Counter is a **private, offline-first** personal tracking app. No account required, no data leaves your device. It helps you monitor your daily CBD and THC intake with a clean, expressive UI — so you can make informed, mindful decisions about your consumption.
 
-La posibilidad de poder añadir notas fue implementada un tiempo después de empezar el proyecto a partir de un Artifact de Claude Sonnet 4, que fue la base sobre la que seguí iterando mientras creaba y aprendía de forma práctica.
+> ⚠️ This app **doesn't work as a medical device**. It does not provide medical advice and does not promote substance use. Use responsibly and always consult a healthcare professional for health-related decisions, **and DYOR** *(DoYourOwnResearch)* **ALWAYS**.
 
-Implementado en su momento para mayor comodidad por preferencia personal, el método *appendTimestampToTodayNote()* para que cada vez que se pulse +1, crear notas en ese día con un 🔸 seguido de la hora en formato 24H. Al igual que ha sido incluido en el código también el mismo método pero a la inversa, para que al pulsar -1 se borre el string que se ha generado _(por si +1 se pulsa por error, no tener que eliminarlo de la nota de forma manual)_.
+This app does not promote substance use at all, but here is a message: everybody is free to do whatever they want with their body and mind (as long as their actions don't cause harm to others), and getting real information about it without political bias, and promoting to you and others **harm reduction and responsible use**. Everyone is free, as long as their actions don't cause harm to others: **"Non-Aggression Principle: Libertarian Foundation"**
 
-Desde poco después del inicio fueron implementadas las opciones de Exportar e Importar CSV, que primero estaban implementados como MaterialButton en la parte inferior de la app, pero esto quitaba espacio al historial (RecyclerView).
-Para optimizar la interfaz, los sustituí por ImageButton/IconButton, más compactos e intuitivos, y los coloqué en la parte superior.
+---
+## Screenshoots
 
-Como todos los proyectos que he desarrollado hasta ahora (publicos y aún sin publicar), ha sido desarrollado siguiendo un enfoque de aprendizaje basado en proyectos, o Project-Based Learning, mediante el uso de IA para implementar nuevas funciones, aprender nuevos conceptos, tomar notas de como funciona cada cosa, y posteriormente al final de cada fix o feature, exportando el chat para estudiarlo a medida que sigo modificando y probando la app, especialmente las que uso diariamente.
+**Comming soon!**
 
+## Features
 
-Hecho para uso personal, y compartido por el amor al open source y su comunidad ❤️
+### 🔢 Dual Counter
+- Separate **CBD** and **THC** counters for the same day
+- Quick **+1** button to count CBD.
+- **Infused add** — log a session tagged as *weed* 🌿 or *pollen* 🍫 (always counts as THC)
+- **−1** correction with confirmation dialog and chance to delete or keep the note linked to it, if there is any; feedback shown if counter is already at 0
+- **Reset** with confirmation — resets only the active substance for today
 
+### 📅 Calendar View
+- Monthly grid with a **mood emoji on each day** reflecting that day's total intake
+- Tap any day to open a **Day Modal** with full breakdown (CBD, THC, voice note, timestamp log)
+- Previous/next month navigation
+- **Emoji legend** — full intake scale explained at a glance
 
-## 📸 Capturas de pantalla (versión 1.2)
-Aquí algunas capturas en tema claro y oscuro, mostrando el contador, el historial, las notas y el widget en acción 👇
+### 📊 Statistics Dashboard  *(→ 📊 Estadísticas chip)*
+- **Today / Week / Average / Clean streak** metric cards — ME3 Expressive colors:
+  - Today → ice blue · Week → warm orange · Average → lime green · Streak → lavender
+- **Patterns** section — busiest day of the week by average intake
+- Embedded **mini line chart** (7D / 14D / 30D)
 
+### 📈 Evolution Chart
+- Full-screen smooth line chart: **7D · 14D · 30D · 60D** ranges
+- Navigate backwards in time with ← → arrow buttons
+- Value labels with smart **label-skip** for crowded 30D/60D views
 
-<img width="400" height="699" alt="image" src="https://github.com/user-attachments/assets/e6c8e1f9-6555-4633-a44f-47a3833c1259" />
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/b2f65ea2-a472-4460-9da7-2e7274a72605" width="260"/>
-  <img src="https://github.com/user-attachments/assets/94f10a04-3c53-44e3-8681-7000b39ba78b" width="260"/>
-  <img src="https://github.com/user-attachments/assets/25616dbf-3ba4-499c-9a26-c0287dea2d9a" width="260"/>
-</p>
+### 🎙️ Voice Notes
+- Record a short audio note for any day directly from the history or Day Modal
+- Playback and delete — stored privately on-device (M4A format)
+- Handles `RECORD_AUDIO` permission request on first use
 
-<details>
-  <summary>Ver más capturas</summary>
+### 📤 Import / Export CSV
+- Export all history as a `.csv` file (shareable with any spreadsheet app)
+- Import from a `.csv` — restores or merges per-day data
+- Access from top-right icons (↑ export · ↓ import, and yeah is reversed as usual icons are about this, but I don't agree seeing it as contradictory when it's actually inverted)
 
-  <p align="center">
-    <img src="https://github.com/user-attachments/assets/2ff86285-f835-4ec8-854d-4128b581afeb" width="260"/>
-    <img src="https://github.com/user-attachments/assets/e44e2091-8693-4ae2-8b69-119773a83120" width="260"/>
-    <img src="https://github.com/user-attachments/assets/551b7675-42d8-4fcb-8200-c724135af18c" width="260" />
-    <img src="https://github.com/user-attachments/assets/5a6cabbb-ef51-4cfb-a5b2-ab2d19f2181f" width="260" />
-  </p>
-  <p align="center">
+### ☀️ Light / Dark Theme Toggle
+- Full redesigned **Material Expressive 3** day/night theme, till v1.5
+- Toggle ☀️/🌙 button always visible in the top-right icon column
+- Status bar icons adapt automatically (dark in light mode, light in dark mode)
+- Preference persisted across sessions
 
- 
+### 🏠 Home Screen Widget (2×2)
+- ME3 card design: solid purple `#6750A4` (light) / deep indigo `#1E1640` (dark)
+- Shows: **date** · **CBD/THC mode badge** · **mood emoji** · **total counter**
+- Four action buttons: 🌿 Weed · ↺ Reset · 🍫 Pollen · **+1**
+- Midnight auto-refresh via AlarmManager
 
+### ⚙️ Settings
+- Switch default tracking mode: **CBD ↔ THC** *(this part of the app need to be improved to offer a proper design if only THC is selected)*
+- **Customize emojis** for each intake level (reflected on counter, calendar, widget)
+- CSV export/import for backup & restore
 
 ---
 
-## ✨ Características
+## Tech Stack
 
-- 📲 **Widget 2.0**: Nuevo diseño 2x2 optimizado. Suma desde la pantalla de inicio con botones cuadrados y emojis unificados.
-- ➖ **Deshacer inteligente (-1)**: Opción de borrar la última entrada o mantener la nota en el historial.
-- 🙂 **Emojis dinámicos (151)**: el icono del día cambia según el contador. Puedes personalizar el set de emojis a tu gusto.
-- 📝 **Notas por día**: añade texto libre con marcas de tiempo automáticas (`🌿 HH:mm`).
-- 🔄 **Exportar / Importar CSV**: guarda tus datos o muévelos entre dispositivos.
-- 🔒 **Datos 100% locales**: persistencia incluso tras cerrar la app. Sin anuncios. Sin analytics.
-- 🎨 **Interfaz minimalista**: clara, ligera y enfocada en el flujo diario.
-- 💨 **Aliñados rápidos (+1 extra)**: botón adicional para marcar tipo de mezcla:
-  - 🟢 *Weed* (🌿)
-  - 🟤 *Polen* (🍫)
- 
-  Se registran en las notas del día con su icono y hora para distinguirlos de los +1 estándar.
-  Una imágen de ejemplo:
-
-  <img width="640" height="317" alt="image" src="https://github.com/user-attachments/assets/da9f0188-0604-40ae-aee4-06caebefc9e7" />
-
+| Layer | Technology |
+|-------|-----------|
+| Language | Kotlin 2.0 |
+| UI | Material Design 3 / Material Expressive 3 |
+| Architecture | Single-Activity + Fragments + BottomSheetDialogFragment |
+| Storage | SharedPreferences (zero dependencies, offline-first) |
+| Audio | MediaRecorder API — M4A/AAC |
+| Chart | Custom `LineChartView` — Canvas API, Catmull-Rom spline |
+| Widget | AppWidgetProvider + RemoteViews |
+| Theme system | AppCompatDelegate DayNight + `values-night/` token overrides |
+| Min SDK | API 26 (Android 8.0 Oreo) |
+| Target SDK | API 35 (Android 15) |
 
 ---
 
-## 📜 Licencia
-Este proyecto está bajo la licencia [GPL-3.0](LICENSE).
+## Project Structure
 
+```
+app/src/main/
+├── java/com/d4vram/cbdcounter/
+│   ├── MainActivity.kt           # Main counter + history
+│   ├── DashboardActivity.kt      # Stats dashboard + mini chart
+│   ├── CalendarActivity.kt       # Monthly emoji calendar
+│   ├── EvolutionActivity.kt      # Full-screen evolution chart
+│   ├── DayModalFragment.kt       # Per-day detail bottom sheet
+│   ├── VoiceNoteBottomSheet.kt   # Audio recording/playback
+│   ├── CBDWidgetProvider.kt      # Home screen widget provider
+│   ├── Prefs.kt                  # SharedPrefs wrapper (all data I/O)
+│   ├── EmojiUtils.kt             # Emoji scale engine
+│   └── LineChartView.kt          # Custom Canvas line chart
+└── res/
+    ├── values/                   # Light theme colors + all strings (es)
+    ├── values-night/             # Dark theme color token overrides
+    └── drawable[-night]/         # Shape drawables (dual-theme)
+```
 
-## 🚀 Cómo compilar
-1. Clonar este repositorio: 
-   ```bash
-   
-   git clone https://github.com/D4vRAM369/CBDcounter.git
-   cd CBDcounter
-   ./gradlew clean assembleDebug
-   ./gradlew clean assembleRelease
+---
+
+## Versioning
+
+| Version | Highlights |
+|---------|-----------|
+| **v1.5** | Material Expressive 3 · Light/Dark toggle ☀️🌙 · ME3 Dashboard cards · Widget ME3 redesign · Evolution 14D/60D · label-skip chart fix |
+| **v1.4.1** | Calendar + emoji map · Statistics dashboard · Voice notes crash fix · CSV import/export · broken buttons replaced |
+| **v1.4** | Dual CBD/THC counter · History tabs (Week / Month / All) · Day Modal |
+| **v1.3** | Home screen widget · Settings & emoji customization |
+| **v1.0–1.2** | Initial release · Basic counter · Simple history |
+
+---
+
+## Installation
+
+### Build from source
+
+```bash
+git clone https://github.com/d4vram/CBDcounter2.git
+cd CBDcounter2
+git checkout main          # stable release
+```
+
+Open in **Android Studio Ladybug 2024.2+** and run on device/emulator with API 26+.
+
+### Releases
+
+Pre-built APKs available on the [Releases page](https://github.com/d4vram/CBDcounter2/releases).
+
+---
+
+## Privacy
+
+- ✅ **100% offline** — no internet permission declared
+- ✅ No analytics, no crash reporting, no tracking
+- ✅ All data lives in `SharedPreferences` and private app storage. Working on SAF *(Storage Access Framework)* to be able to save the data in the folder you want to choose, and not in android/data/ by default (not accessible without root permission in phone)
+- ✅ Voice notes stored in private internal storage — inaccessible to other apps
+
+---
+
+## Known Limitations / Roadmap
+
+- [ ] i18n: ~30 hardcoded Spanish strings in layouts — needs migration to `strings.xml` + `values-en/`
+- [ ] Responsive widget layouts for 2×3 (show CBD·THC split line when widget is enlarged)
+- [ ] Dark mode auto-follow system setting (currently manual toggle only)
+- [ ] Room DB migration for larger data sets (currently SharedPreferences)
+
+---
+
+## License
+
+GPL-3.0 — see [LICENSE](LICENSE).
+
+---
+
+## Medical Disclaimer
+
+This application is a personal tracking tool only, as I stated at the beginning of the doc. It is **not a medical device**, does not provide medical advice and does not promote or facilitate the purchase or sale of any substance. Always consult a qualified healthcare professional for health-related decisions, and take good decisions by your own with the correct information and measure.
+
+_**''If you don't use your mind, no worries: other people will use it for you''**_

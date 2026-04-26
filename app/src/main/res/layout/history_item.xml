@@ -20,7 +20,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:barrierDirection="start"
-            app:constraint_referenced_ids="historyCount"/>
+            app:constraint_referenced_ids="countersContainer"/>
 
         <!-- Emoji indicador -->
         <TextView
@@ -75,7 +75,7 @@
             app:layout_constraintEnd_toStartOf="@id/audioBadge"
             app:layout_constraintBaseline_toBaselineOf="@id/historyDate"/>
 
-        <!-- Indicador de audio -->
+        <!-- Indicador de audio (badge pasivo) -->
         <TextView
             android:id="@+id/audioBadge"
             android:layout_width="wrap_content"
@@ -86,25 +86,75 @@
             android:elevation="4dp"
             android:translationZ="4dp"
             android:contentDescription="Tiene audio"
-            android:layout_marginEnd="12dp"
-            app:layout_constraintEnd_toStartOf="@id/countBarrier"
+            android:layout_marginEnd="4dp"
+            app:layout_constraintEnd_toStartOf="@id/voiceNoteButton"
             app:layout_constraintBaseline_toBaselineOf="@id/historyDate"/>
 
-        <!-- Contador -->
+        <!-- Botón de nota de voz -->
+        <ImageButton
+            android:id="@+id/voiceNoteButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Nota de voz"
+            android:src="@android:drawable/ic_btn_speak_now"
+            android:tint="@color/m3_on_surface_variant"
+            android:padding="4dp"
+            android:layout_marginEnd="4dp"
+            app:layout_constraintEnd_toStartOf="@id/countBarrier"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <!-- Contadores duales apilados -->
+        <LinearLayout
+            android:id="@+id/countersContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="end"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <!-- Chip CBD -->
+            <TextView
+                android:id="@+id/cbdChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3 CBD"
+                android:textSize="14sp"
+                android:textColor="@color/cbd_text"
+                android:textStyle="bold"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="2dp"
+                android:layout_marginBottom="2dp"
+                android:background="@drawable/bg_chip_cbd"
+                android:visibility="gone" />
+
+            <!-- Chip THC -->
+            <TextView
+                android:id="@+id/thcChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2 THC"
+                android:textSize="14sp"
+                android:textColor="@color/thc_text"
+                android:textStyle="bold"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="2dp"
+                android:background="@drawable/bg_chip_thc"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- TextView oculto para compatibilidad con el barrier -->
         <TextView
             android:id="@+id/historyCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="4 CBD"
-            android:textSize="18sp"
-            android:textColor="@color/primary"
-            android:textStyle="bold"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="4dp"
-            android:background="@drawable/count_badge_background"
+            android:visibility="gone"
+            android:text="0"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

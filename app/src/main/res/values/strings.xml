@@ -46,4 +46,122 @@
     <string name="prev_range">Anterior</string>
     <string name="next_range">Siguiente</string>
 
+    <!-- Dashboard Strings -->
+    <string name="dashboard_title">Estadísticas</string>
+    <string name="card_today">Hoy</string>
+    <string name="card_week">Semana</string>
+    <string name="card_avg">Promedio</string>
+    <string name="card_streak">Racha</string>
+    <string name="view_calendar">📅 Ver calendario completo</string>
+    <string name="patterns_title">Patrones</string>
+    <string name="pattern_busiest_day">Día más activo: %1$s</string>
+    <string name="pattern_best_day">Mejor día: %1$s (%2$d)</string>
+
+    <!-- Toggle & THC Strings -->
+    <string name="settings_substance_title">Tipo de Sustancia</string>
+    <string name="thc">THC</string>
+    <string name="thc_added">THC agregado</string>
+    <string name="thc_subtracted">THC restado</string>
+    <string name="thc_infused_added_weed">THC con weed agregado</string>
+    <string name="thc_infused_added_polem">THC con polen agregado</string>
+    <string name="infusion_question_thc">¿Qué estás fumando?</string>
+    <string name="infusion_subtitle_thc">Etiqueta la toma con vibra 420.</string>
+
+    <!-- Settings Strings -->
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_backup_title">Copia de Seguridad</string>
+    <string name="backup_auto_label">Backup automático</string>
+    <string name="backup_csv_btn">📄 Exportar datos (CSV)</string>
+    <string name="backup_audio_btn">🎙️ Exportar audios (ZIP)</string>
+    <string name="backup_create_btn">💾 Crear backup ahora</string>
+    <string name="backup_restore_btn">📥 Restaurar backup</string>
+    <string name="backup_encrypt_label">Cifrar con contraseña (AES-256)</string>
+    <string name="backup_success">Backup creado con éxito</string>
+    <string name="restore_success">Datos restaurados correctamente</string>
+    <string name="backup_password_prompt">Introduce contraseña del backup</string>
+    <string name="settings_emoji_title">Personalizar Emojis</string>
+    <string name="settings_emoji_subtitle">Toca un emoji para cambiarlo. Se actualizará en la pantalla principal y en el widget.</string>
+    <string name="settings_reset_emoji">Restaurar emojis por defecto</string>
+
+    <!-- SAF Backup folder & interval -->
+    <string name="backup_folder_label">Carpeta de backup</string>
+    <string name="backup_folder_none">No seleccionada — toca para elegir</string>
+    <string name="backup_change_folder">📂 Cambiar carpeta</string>
+    <string name="backup_interval_label">Frecuencia del backup automático</string>
+    <string name="backup_interval_12h">Cada 12 h</string>
+    <string name="backup_interval_24h">Cada 24 h</string>
+    <string name="backup_folder_saved">Carpeta guardada correctamente</string>
+    <string name="backup_no_folder">Selecciona una carpeta primero</string>
+    <string name="backup_csv_saved">CSV guardado en la carpeta seleccionada</string>
+    <string name="backup_zip_saved">Audios guardados en la carpeta seleccionada</string>
+
+    <!-- i18n: content descriptions -->
+    <string name="content_desc_settings">Ajustes</string>
+    <string name="content_desc_calendar">Calendario</string>
+    <string name="content_desc_theme_toggle">Cambiar tema</string>
+    <string name="content_desc_search">Buscar en notas</string>
+
+    <!-- i18n: MainActivity bottom sheet / action buttons -->
+    <string name="add_infused_label">🌿 + Añadir aliñado</string>
+    <string name="stats_chip_label">📊 Estadísticas</string>
+    <string name="avg_placeholder">Promedio: 0</string>
+    <string name="total_placeholder">Total: 0</string>
+    <string name="streak_placeholder">Racha: 0d</string>
+    <string name="subtract_button_label">-1</string>
+    <string name="add_thc_label">🍁 +THC</string>
+    <string name="reset_button_label">Reset</string>
+
+    <!-- i18n: dynamic stats text formats -->
+    <string name="avg_format">Promedio: %.1f</string>
+    <string name="total_format">Total: %1$d</string>
+    <string name="streak_format">Racha limpia: %1$d días</string>
+    <string name="streak_reset">Racha: 0 días</string>
+
+    <!-- i18n: history tab labels -->
+    <string name="tab_week">Semana</string>
+    <string name="tab_month">Mes</string>
+    <string name="tab_all">Todo</string>
+
+    <!-- i18n: Dashboard evolution section -->
+    <string name="evolution_section_title">Evolución</string>
+    <string name="chip_7d">7D</string>
+    <string name="chip_14d">14D</string>
+    <string name="chip_30d">30D</string>
+    <string name="busiest_day_default">Día más activo: -</string>
+
+    <!-- i18n: Evolution activity -->
+    <string name="evolution_title_toolbar">Evolución</string>
+    <string name="evolution_title_default">Últimos 7 días</string>
+    <string name="evolution_last_n_days">Últimos %1$d días</string>
+    <string name="evolution_ago_range">Hace %1$d–%2$d días</string>
+    <string name="chip_7_days">7 Días</string>
+    <string name="chip_14_days">14 Días</string>
+    <string name="chip_30_days">30 Días</string>
+    <string name="chip_60_days">60 Días</string>
+
+    <!-- i18n: Calendar day headers (Mon–Sun starting on Monday) -->
+    <string name="cal_day_mon">L</string>
+    <string name="cal_day_tue">M</string>
+    <string name="cal_day_wed">X</string>
+    <string name="cal_day_thu">J</string>
+    <string name="cal_day_fri">V</string>
+    <string name="cal_day_sat">S</string>
+    <string name="cal_day_sun">D</string>
+
+    <!-- i18n: Calendar legend / stats screen -->
+    <string name="legend_title">Leyenda</string>
+    <string name="view_evolution">Ver Evolución 📈</string>
+    <string name="no_data">Sin datos</string>
+
+    <!-- i18n: Days of week array (Sun=0 … Sat=6, Calendar.DAY_OF_WEEK order) -->
+    <string-array name="days_of_week">
+        <item>Domingo</item>
+        <item>Lunes</item>
+        <item>Martes</item>
+        <item>Miércoles</item>
+        <item>Jueves</item>
+        <item>Viernes</item>
+        <item>Sábado</item>
+    </string-array>
+
 </resources>

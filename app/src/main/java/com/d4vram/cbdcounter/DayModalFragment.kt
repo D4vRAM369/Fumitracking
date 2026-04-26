@@ -79,13 +79,34 @@ class DayModalFragment : DialogFragment() {
         setupSeekBarListener()
 
 
+        val breakdownLabel = view.findViewById<TextView>(R.id.breakdownLabel)
+
         date?.let { d ->
             modalTitle.text = "Día: $d"
 
-            // Load count
-            val count = requireContext().getSharedPreferences("CBDCounter", android.content.Context.MODE_PRIVATE)
-                .getInt("count_$d", 0)
+            // Load count (TOTAL = CBD + THC)
+            val count = Prefs.getTotalCount(requireContext(), d)
             takesLabel.text = "Tomas: $count"
+
+            // Desglose por tipo (contando emojis en las notas)
+            val note = Prefs.getNote(requireContext(), d) ?: ""
+            val lines = note.split("\n").filter { it.isNotBlank() }
+            val cbdPure = lines.count { it.trim().startsWith("🔹") || it.trim().startsWith("🟢") }
+            val weedCount = lines.count { it.contains("🌿") }
+            val polenCount = lines.count { it.contains("🍫") }
+
+            val breakdown = buildList {
+                if (cbdPure > 0) add("$cbdPure 🔹")
+                if (weedCount > 0) add("$weedCount 🌿")
+                if (polenCount > 0) add("$polenCount 🍫")
+            }.joinToString("  ·  ")
+
+            if (breakdown.isNotEmpty()) {
+                breakdownLabel.text = breakdown
+                breakdownLabel.visibility = View.VISIBLE
+            } else {
+                breakdownLabel.visibility = View.GONE
+            }
 
             // Load note
             noteEditText.setText(Prefs.getNote(requireContext(), d) ?: "")

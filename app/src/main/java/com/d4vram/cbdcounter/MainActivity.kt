@@ -14,7 +14,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,10 +29,11 @@ import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.tabs.TabLayout
-import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.chip.Chip
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import androidx.dynamicanimation.animation.SpringAnimation
+import androidx.dynamicanimation.animation.SpringForce
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -38,23 +41,31 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, VoiceNoteBottomSheet.Listener {
 
     // Views principales
-    private lateinit var counterText: TextView
+    private lateinit var counterText: TextView  // Oculto, para compatibilidad
+    private lateinit var cbdCountText: TextView
+    private lateinit var thcCountText: TextView
+
     private lateinit var dateText: TextView
     private lateinit var emojiText: TextView
     private lateinit var addButton: Button
     private lateinit var addInfusedButton: MaterialButton
-    private lateinit var statsButton: Chip
     private lateinit var subtractButton: Button
     private lateinit var resetButton: Button
-    private lateinit var exportButton: ImageButton
-    private lateinit var importButton: ImageButton
     private lateinit var settingsButton: ImageButton
 
-    // Botón switch para cambiar el tema
-    private lateinit var themeSwitch: SwitchMaterial
+    // Iconos top-right
+    private lateinit var calendarButton: ImageButton
+    private lateinit var exportCsvIconButton: ImageButton
+    private lateinit var importCsvIconButton: ImageButton
+
+    // Chip estadísticas
+    private lateinit var statsChip: com.google.android.material.chip.Chip
+
+    // Botón toggle tema claro/oscuro
+    private lateinit var themeToggleButton: ImageButton
 
     // Views del historial mejorado
     private lateinit var historyRecyclerView: RecyclerView
@@ -68,7 +79,9 @@ class MainActivity : AppCompatActivity() {
 
     // Data
     private lateinit var sharedPrefs: SharedPreferences
-    private var currentCount = 0
+    private var cbdCount = 0
+    private var thcCount = 0
+    private val currentCount: Int get() = cbdCount + thcCount  // Total para emoji y compatibilidad
     private val allHistoryData = ArrayList<HistoryItem>()
     private val displayedHistoryData = ArrayList<HistoryItem>()
     private var currentViewMode = ViewMode.WEEK
@@ -121,16 +134,19 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         // 1. Aplicar tema ANTES de super.onCreate para evitar flickering
         initSharedPreferences()
+        Prefs.migrateToV14IfNeeded(this)  // Migrar datos al nuevo formato si es necesario
         applyStoredTheme()
-        
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         // Hacer que el contenido se dibuje detrás de la barra de estado
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(false)
+            // Iconos de barra de estado: oscuros en light mode, claros en dark mode
+            val isDark = isDarkModeEnabled()
             window.insetsController?.setSystemBarsAppearance(
-                0,
+                if (isDark) 0 else WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
                 WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
             )
         } else {
@@ -151,6 +167,13 @@ class MainActivity : AppCompatActivity() {
             updateDisplay(animate = false)
             updateHistoryView()
             updateStats()
+
+            // BottomSheet behavior
+            val bottomSheet = findViewById<LinearLayout>(R.id.bottomSheetContainer)
+            val sheetBehavior = BottomSheetBehavior.from(bottomSheet)
+            sheetBehavior.peekHeight = (260 * resources.displayMetrics.density).toInt()
+            sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            sheetBehavior.isHideable = false
         }.onFailure { e ->
             showFeedback("Error al iniciar la app: ${e.message}", true)
             e.printStackTrace()
@@ -188,29 +211,23 @@ class MainActivity : AppCompatActivity() {
 
     private fun initViews() {
         // Views principales
-        counterText = findViewById(R.id.counterText)
+        counterText = findViewById(R.id.counterText)  // Oculto, para compatibilidad
+        cbdCountText = findViewById(R.id.cbdCountText)
+        thcCountText = findViewById(R.id.thcCountText)
+
         dateText = findViewById(R.id.dateText)
         emojiText = findViewById(R.id.emojiText)
         addButton = findViewById(R.id.addButton)
         addInfusedButton = findViewById(R.id.addInfusedButton)
-        statsButton = findViewById(R.id.statsButton)
         subtractButton = findViewById(R.id.subtractButton)
         resetButton = findViewById(R.id.resetButton)
-        exportButton = findViewById(R.id.exportButton)
-        importButton = findViewById(R.id.importButton)
         settingsButton = findViewById(R.id.settingsButton)
-        themeSwitch = findViewById(R.id.themeSwitch)    
-
-        // Estado inicial del switch según preferencias o sistema
-        val isNight = isDarkModeEnabled()
-        themeSwitch.setOnCheckedChangeListener(null)
-        themeSwitch.isChecked = isNight
-        
-        themeSwitch.setOnCheckedChangeListener { _, checked ->
-            if (checked != isDarkModeEnabled()) {
-                setDarkMode(checked)
-            }
-        }
+        calendarButton = findViewById(R.id.calendarButton)
+        exportCsvIconButton = findViewById(R.id.exportCsvIconButton)
+        importCsvIconButton = findViewById(R.id.importCsvIconButton)
+        statsChip = findViewById(R.id.statsChip)
+        themeToggleButton = findViewById(R.id.themeToggleButton)
+        updateThemeIcon()
 
         // Historial
         historyRecyclerView = findViewById(R.id.historyRecyclerView)
@@ -222,9 +239,13 @@ class MainActivity : AppCompatActivity() {
         searchButton = findViewById(R.id.searchButton)
 
         // Adapter con callback para abrir el modal de notas
-        historyAdapter = ImprovedHistoryAdapter(displayedHistoryData) { date ->
-            DayModalFragment.newInstance(date).show(supportFragmentManager, "day_modal")
-        }
+        historyAdapter = ImprovedHistoryAdapter(
+            historyList = displayedHistoryData,
+            onDayClick = { date ->
+                DayModalFragment.newInstance(date).show(supportFragmentManager, "day_modal")
+            },
+            fragmentManager = supportFragmentManager
+        )
         historyRecyclerView.layoutManager = LinearLayoutManager(this)
         historyRecyclerView.adapter = historyAdapter
 
@@ -247,9 +268,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupTabLayout() {
-        tabLayout.addTab(tabLayout.newTab().setText("Semana"))
-        tabLayout.addTab(tabLayout.newTab().setText("Mes"))
-        tabLayout.addTab(tabLayout.newTab().setText("Todo"))
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.tab_week)))
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.tab_month)))
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.tab_all)))
 
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
@@ -279,24 +300,24 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadTodayData() {
         val today = getCurrentDateKey()
-        currentCount = sharedPrefs.getInt("count_$today", 0)
+        cbdCount = Prefs.getCbdCount(this, today)
+        thcCount = Prefs.getThcCount(this, today)
     }
 
     private fun loadAllHistoryData() {
         allHistoryData.clear()
-        val allEntries = sharedPrefs.all
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
-        allEntries.forEach { (key, value) ->
-            if (key.startsWith("count_") && value is Int) {
-                val dateString = key.removePrefix("count_")
-                try {
-                    val date = dateFormat.parse(dateString)
-                    if (date != null) {
-                        allHistoryData.add(HistoryItem(dateString, value, date))
-                    }
-                } catch (_: Exception) {}
-            }
+        val allDates = Prefs.getAllDatesWithData(this)
+        allDates.forEach { dateString ->
+            try {
+                val date = dateFormat.parse(dateString)
+                if (date != null) {
+                    val cbd = Prefs.getCbdCount(this, dateString)
+                    val thc = Prefs.getThcCount(this, dateString)
+                    allHistoryData.add(HistoryItem(dateString, cbd, thc, date))
+                }
+            } catch (_: Exception) {}
         }
         allHistoryData.sortByDescending { it.dateObject }
     }
@@ -331,31 +352,33 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateStats() {
         if (displayedHistoryData.isEmpty()) {
-            avgText.text = "Promedio: 0"
-            totalText.text = "Total: 0"
-            streakText.text = "Racha: 0 días"
+            avgText.text = getString(R.string.avg_placeholder)
+            totalText.text = getString(R.string.total_placeholder)
+            streakText.text = getString(R.string.streak_reset)
             return
         }
-        val average = displayedHistoryData.map { it.count }.average()
-        avgText.text = "Promedio: %.1f".format(average)
-        val total = displayedHistoryData.sumOf { it.count }
-        totalText.text = "Total: $total"
+        val average = displayedHistoryData.map { it.totalCount }.average()
+        avgText.text = getString(R.string.avg_format).format(average)
+        val total = displayedHistoryData.sumOf { it.totalCount }
+        totalText.text = getString(R.string.total_format, total)
         val streak = calculateCleanStreak()
-        streakText.text = "Racha limpia: $streak días"
+        streakText.text = getString(R.string.streak_format, streak)
     }
 
     private fun calculateCleanStreak(): Int {
         var streak = 0
         val sortedData = allHistoryData.sortedByDescending { it.dateObject }
         for (item in sortedData) {
-            if (item.count == 0) streak++ else break
+            if (item.totalCount == 0) streak++ else break
         }
         return streak
     }
 
     private fun saveData() {
         val today = getCurrentDateKey()
-        sharedPrefs.edit().putInt("count_$today", currentCount).apply()
+        Prefs.setCbdCount(this, today, cbdCount)
+        Prefs.setThcCount(this, today, thcCount)
+
         loadAllHistoryData()
         updateHistoryView()
         updateStats()
@@ -368,6 +391,21 @@ class MainActivity : AppCompatActivity() {
             AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES ||
             (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
         )
+    }
+
+    private fun updateThemeIcon() {
+        val isDark = isDarkModeEnabled()
+        // En oscuro → mostramos Sol (para pasar a claro); en claro → Luna (para pasar a oscuro)
+        themeToggleButton.setImageResource(
+            if (isDark) R.drawable.ic_sun else R.drawable.ic_moon
+        )
+        // Ajustar iconos de barra de estado: claros en dark mode, oscuros en light mode
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.setSystemBarsAppearance(
+                if (isDark) 0 else WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+            )
+        }
     }
 
     private fun applyStoredTheme() {
@@ -386,44 +424,107 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateDisplay(animate: Boolean = true) {
-        counterText.text = currentCount.toString()
+        // Actualizar contadores duales
+        cbdCountText.text = cbdCount.toString()
+        thcCountText.text = thcCount.toString()
+        counterText.text = currentCount.toString()  // Total oculto para compatibilidad
+
         dateText.text = getCurrentDateDisplay()
         val newEmoji = getEmoji(currentCount)
-        
+
         if (animate && emojiText.text != newEmoji && emojiText.text.isNotEmpty()) {
             emojiText.animate().alpha(0f).setDuration(150).withEndAction {
                 emojiText.text = newEmoji
                 emojiText.animate().alpha(1f).setDuration(150).start()
+                animateEmoji()
             }.start()
         } else {
             emojiText.alpha = 1f
             emojiText.text = newEmoji
         }
 
-        val color = when {
-            currentCount == 0 -> R.color.green_safe
-            currentCount <= 3 -> R.color.yellow_warning
-            currentCount <= 6 -> R.color.orange_danger
+        // Destacar el modo activo
+        val isThc = Prefs.getSubstanceType(this) == "THC"
+        highlightActiveCounter(isThc)
+
+        // Actualizar colores según cantidad
+        updateCounterColors()
+    }
+
+    private fun highlightActiveCounter(isThcActive: Boolean) {
+        // El contador activo se ve más grande/destacado
+        val activeScale = 1.1f
+        val inactiveScale = 0.9f
+        val activeAlpha = 1.0f
+        val inactiveAlpha = 0.6f
+
+        if (isThcActive) {
+            thcCountText.scaleX = activeScale
+            thcCountText.scaleY = activeScale
+            thcCountText.alpha = activeAlpha
+            cbdCountText.scaleX = inactiveScale
+            cbdCountText.scaleY = inactiveScale
+            cbdCountText.alpha = inactiveAlpha
+        } else {
+            cbdCountText.scaleX = activeScale
+            cbdCountText.scaleY = activeScale
+            cbdCountText.alpha = activeAlpha
+            thcCountText.scaleX = inactiveScale
+            thcCountText.scaleY = inactiveScale
+            thcCountText.alpha = inactiveAlpha
+        }
+    }
+
+    private fun updateCounterColors() {
+        // Colores CBD según cantidad
+        val cbdColor = when {
+            cbdCount == 0 -> R.color.green_safe
+            cbdCount <= 4 -> R.color.cbd_text
+            cbdCount <= 6 -> R.color.orange_danger
             else -> R.color.red_critical
         }
-        counterText.setTextColor(ContextCompat.getColor(this, color))
+        cbdCountText.setTextColor(ContextCompat.getColor(this, cbdColor))
+
+        // Colores THC según cantidad
+        val thcColor = when {
+            thcCount == 0 -> R.color.green_safe
+            thcCount <= 4 -> R.color.thc_text
+            thcCount <= 6 -> R.color.orange_danger
+            else -> R.color.red_critical
+        }
+        thcCountText.setTextColor(ContextCompat.getColor(this, thcColor))
     }
 
     private fun getEmoji(count: Int): String = EmojiUtils.emojiForCount(count, this)
 
     private fun setupClickListeners() {
+        calendarButton.setOnClickListener {
+            startActivity(Intent(this, CalendarActivity::class.java))
+        }
+        exportCsvIconButton.setOnClickListener { exportCsv() }
+        importCsvIconButton.setOnClickListener { importCsvLauncher.launch(importMimeTypes) }
+        statsChip.setOnClickListener { startActivity(Intent(this, DashboardActivity::class.java)) }
+        themeToggleButton.setOnClickListener {
+            setDarkMode(!isDarkModeEnabled())
+        }
+
         addButton.setOnClickListener { registerStandardIntake() }
-        addInfusedButton.setOnClickListener { showInfusionDialog() }
-        statsButton.setOnClickListener { openStatsCalendar() }
+        addInfusedButton.setOnClickListener {
+            InfusionChoiceBottomSheet.new()
+                .show(supportFragmentManager, "infusion_choice")
+        }
         settingsButton.setOnClickListener {
             // Abrir pantalla de ajustes generales
             startActivity(Intent(this, SettingsActivity::class.java))
         }
         subtractButton.setOnClickListener {
-        if (currentCount > 0) {
+        val isThc = Prefs.getSubstanceType(this) == "THC"
+        val activeCount = if (isThc) thcCount else cbdCount
+
+        if (activeCount > 0) {
             // Inflar layout personalizado
             val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_confirm_delete, null)
-            
+
             // Crear el diálogo
             val dialog = MaterialAlertDialogBuilder(this)
                 .setView(dialogView)
@@ -432,17 +533,18 @@ class MainActivity : AppCompatActivity() {
 
             // Configurar chips
             dialogView.findViewById<View>(R.id.chip_confirm).setOnClickListener {
-                currentCount--
+                if (isThc) thcCount-- else cbdCount--
                 updateDisplay()
-                removeLastEntryFromTodayNote()  // 🎯 Borrar último timestamp
+                removeLastEntryFromTodayNote()  // Borrar último timestamp
                 saveData()
                 animateCounter(0.9f)
-                showFeedback(getString(R.string.cbd_subtracted), true)
+                val msg = if (isThc) getString(R.string.thc_subtracted) else getString(R.string.cbd_subtracted)
+                showFeedback(msg, true)
                 dialog.dismiss()
             }
 
             dialogView.findViewById<View>(R.id.chip_keep_note).setOnClickListener {
-                currentCount--
+                if (isThc) thcCount-- else cbdCount--
                 updateDisplay()
                 // NO borramos la nota, solo restamos el contador
                 saveData()
@@ -455,33 +557,24 @@ class MainActivity : AppCompatActivity() {
                 dialog.dismiss()
             }
 
-            // Mostrar con fondo transparente para que se vea bien el card (opcional, pero recomendado si el root es CardView)
+            // Mostrar con fondo transparente para que se vea bien el card
             dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
             dialog.show()
+        } else {
+            val substance = if (isThc) "THC" else "CBD"
+            showFeedback("No hay $substance que restar", false)
         }
     }
         resetButton.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Reiniciar contador")
-                .setMessage("¿Estás seguro de que quieres reiniciar el contador de hoy?")
+                .setMessage("¿Estás seguro de que quieres reiniciar el contador de hoy? (CBD y THC)")
                 .setPositiveButton("Sí") { _, _ ->
-                    currentCount = 0
+                    cbdCount = 0
+                    thcCount = 0
                     updateDisplay()
                     saveData()
                     showFeedback("¡Día reiniciado! 💪", true)
-                }
-                .setNegativeButton("Cancelar", null)
-                .show()
-        }
-
-        exportButton.setOnClickListener { exportCsv() }
-        importButton.setOnClickListener {
-            // Mostrar diálogo de confirmación antes de importar
-            MaterialAlertDialogBuilder(this)
-                .setTitle("⚠️ Importar datos")
-                .setMessage("Esto BORRARÁ todos tus datos actuales (historial, notas y emojis personalizados) y los reemplazará con los del archivo CSV.\n\n¿Estás seguro de continuar?")
-                .setPositiveButton("Sí, importar") { _, _ ->
-                    importCsvLauncher.launch(importMimeTypes)
                 }
                 .setNegativeButton("Cancelar", null)
                 .show()
@@ -535,32 +628,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun buildCsvContent(): String {
-        val prefsMap = sharedPrefs.all
-        if (prefsMap.isEmpty()) return ""
-
-        val dates = mutableSetOf<String>()
-        prefsMap.keys.forEach { key ->
-            when {
-                key.startsWith("count_") -> dates.add(key.removePrefix("count_"))
-                key.startsWith("NOTE_") -> dates.add(key.removePrefix("NOTE_"))
-            }
-        }
-        if (dates.isEmpty()) return ""
+        val allDates = Prefs.getAllDatesWithData(this)
+        if (allDates.isEmpty()) return ""
 
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        val sortedDates = dates.mapNotNull { dateString ->
+        val sortedDates = allDates.mapNotNull { dateString ->
             runCatching { dateFormat.parse(dateString) }.getOrNull()?.let { parsed ->
                 dateString to parsed
             }
         }.sortedBy { it.second }
 
-        val builder = StringBuilder("date,count,note\n")
+        val builder = StringBuilder("date,count_cbd,count_thc,note\n")
         sortedDates.forEach { (dateString, _) ->
-            val count = sharedPrefs.getInt("count_$dateString", 0)
+            val cbdCount = Prefs.getCbdCount(this, dateString)
+            val thcCount = Prefs.getThcCount(this, dateString)
             val note = Prefs.getNote(this, dateString) ?: ""
+
             builder.append(dateString)
                 .append(',')
-                .append(count)
+                .append(cbdCount)
+                .append(',')
+                .append(thcCount)
                 .append(',')
                 .append(escapeCsvField(note))
                 .append('\n')
@@ -576,9 +664,14 @@ class MainActivity : AppCompatActivity() {
                     if (lines.isEmpty()) throw IllegalArgumentException("Archivo vacío")
 
                     val editor = sharedPrefs.edit()
+                    // Limpiar datos existentes
                     sharedPrefs.all.keys.filter {
                         it.startsWith("count_") || it.startsWith("NOTE_")
                     }.forEach { key -> editor.remove(key) }
+
+                    // Detectar formato por cabecera
+                    val header = lines.first().lowercase()
+                    val isNewFormat = header.contains("count_cbd")
 
                     lines.drop(1).forEach { line ->
                         if (line.isBlank()) return@forEach
@@ -586,13 +679,36 @@ class MainActivity : AppCompatActivity() {
                         if (columns.size < 2) return@forEach
 
                         val date = columns[0]
-                        val count = columns[1].toIntOrNull() ?: return@forEach
-                        editor.putInt("count_$date", count)
 
-                        val rawNote = if (columns.size >= 3) columns[2] else ""
-                        val note = unescapeCsvField(rawNote)
-                        if (note.isNotEmpty()) {
-                            editor.putString("NOTE_$date", note)
+                        if (isNewFormat) {
+                            // Nuevo formato: date,count_cbd,count_thc,note
+                            val cbdCount = columns.getOrNull(1)?.toIntOrNull() ?: 0
+                            val thcCount = columns.getOrNull(2)?.toIntOrNull() ?: 0
+                            editor.putInt("${Prefs.KEY_COUNT_CBD_PREFIX}$date", cbdCount)
+                            editor.putInt("${Prefs.KEY_COUNT_THC_PREFIX}$date", thcCount)
+
+                            val rawNote = columns.getOrNull(3) ?: ""
+                            val note = unescapeCsvField(rawNote)
+                            if (note.isNotEmpty()) {
+                                editor.putString("${Prefs.KEY_NOTE_PREFIX}$date", note)
+                            }
+                        } else {
+                            // Formato legacy: date,count,note,substance
+                            val count = columns[1].toIntOrNull() ?: return@forEach
+                            val substance = if (columns.size >= 4) unescapeCsvField(columns[3]) else "CBD"
+
+                            // Importar al contador correspondiente
+                            if (substance == "THC") {
+                                editor.putInt("${Prefs.KEY_COUNT_THC_PREFIX}$date", count)
+                            } else {
+                                editor.putInt("${Prefs.KEY_COUNT_CBD_PREFIX}$date", count)
+                            }
+
+                            val rawNote = if (columns.size >= 3) columns[2] else ""
+                            val note = unescapeCsvField(rawNote)
+                            if (note.isNotEmpty()) {
+                                editor.putString("${Prefs.KEY_NOTE_PREFIX}$date", note)
+                            }
                         }
                     }
                     editor.apply()
@@ -687,44 +803,49 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun registerStandardIntake() {
-        val entry = "🔹 ${getCurrentTimestamp()}"
-        registerIntake(entry, getString(R.string.cbd_added))
+        val isThc = Prefs.getSubstanceType(this) == "THC"
+        val entry = if (isThc) "🟢 ${getCurrentTimestamp()}" else "🔹 ${getCurrentTimestamp()}"
+        val feedback = if (isThc) getString(R.string.thc_added) else getString(R.string.cbd_added)
+        registerIntake(entry, feedback)
     }
 
-    private fun showInfusionDialog() {
-        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_infusion_choice, null)
-        val weedButton = dialogView.findViewById<MaterialButton>(R.id.weedButton)
-        val polemButton = dialogView.findViewById<MaterialButton>(R.id.polemButton)
+    override fun onVoiceNoteChanged(date: String) {
+        historyAdapter.refresh()
+    }
 
-        val dialog = MaterialAlertDialogBuilder(this)
-            .setView(dialogView)
-            .create()
-
-        weedButton.text = "${InfusionType.WEED.icon} ${getString(InfusionType.WEED.labelRes)}"
-        polemButton.text = "${InfusionType.POLEM.icon} ${getString(InfusionType.POLEM.labelRes)}"
-
-        weedButton.setOnClickListener {
-            handleInfusionSelection(InfusionType.WEED)
-            dialog.dismiss()
+    override fun onInfusionTypeSelected(type: String) {
+        val infusionType = when (type) {
+            "weed" -> InfusionType.WEED
+            else -> InfusionType.POLEM
         }
-        polemButton.setOnClickListener {
-            handleInfusionSelection(InfusionType.POLEM)
-            dialog.dismiss()
-        }
-
-        dialog.show()
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        handleInfusionSelection(infusionType)
     }
 
     private fun handleInfusionSelection(type: InfusionType) {
         val label = getString(type.labelRes)
         val suffix = getString(R.string.infusion_note_suffix, label)
         val entry = "${type.icon} ${getCurrentTimestamp()}$suffix"
-        registerIntake(entry, getString(type.feedbackRes))
+        // Infusión (weed/polen) SIEMPRE suma a THC
+        registerThcIntake(entry, getString(type.feedbackRes))
+    }
+
+    /** Registra una toma que siempre va al contador THC (para infusiones) */
+    private fun registerThcIntake(entry: String, feedbackMessage: String) {
+        thcCount++
+        updateDisplay()
+        appendEntryToTodayNote(entry)
+        saveData()
+        animateCounter(1.1f)
+        showFeedback("$feedbackMessage (THC)", false)
     }
 
     private fun registerIntake(entry: String, feedbackMessage: String) {
-        currentCount++
+        val isThc = Prefs.getSubstanceType(this) == "THC"
+        if (isThc) {
+            thcCount++
+        } else {
+            cbdCount++
+        }
         updateDisplay()
         appendEntryToTodayNote(entry)
         saveData()
@@ -742,23 +863,24 @@ class MainActivity : AppCompatActivity() {
     private fun showDisclaimerIfNeeded() {
         val disclaimerAccepted = sharedPrefs.getBoolean("disclaimer_accepted", false)
         if (!disclaimerAccepted) {
-            MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.disclaimer_title)
-                .setMessage(R.string.disclaimer_message)
-                .setPositiveButton(R.string.disclaimer_accept) { _, _ ->
+            val v = LayoutInflater.from(this).inflate(R.layout.dialog_disclaimer, null)
+            val dialog = MaterialAlertDialogBuilder(this)
+                .setView(v)
+                .setCancelable(false)
+                .create()
+
+            v.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnDisclaimerAccept)
+                .setOnClickListener {
                     sharedPrefs.edit().putBoolean("disclaimer_accepted", true).apply()
+                    dialog.dismiss()
                 }
-                .setNegativeButton(R.string.disclaimer_decline) { _, _ ->
-                    // Si el usuario no acepta, cerrar la app
-                    Toast.makeText(
-                        this,
-                        "Debes aceptar el aviso para usar la aplicación",
-                        Toast.LENGTH_LONG
-                    ).show()
+            v.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnDisclaimerDecline)
+                .setOnClickListener {
+                    Toast.makeText(this, "Debes aceptar el aviso para usar la aplicación", Toast.LENGTH_LONG).show()
                     finish()
                 }
-                .setCancelable(false) // No puede cancelar con el botón atrás
-                .show()
+
+            dialog.show()
         }
     }
 
@@ -804,18 +926,42 @@ class MainActivity : AppCompatActivity() {
         Prefs.setNote(this, today, updatedNote)
     }
 
+    private fun animateEmoji() {
+        val emojiView = findViewById<TextView>(R.id.emojiText)
+        SpringAnimation(emojiView, SpringAnimation.SCALE_X, 1f).apply {
+            spring.dampingRatio = SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY
+            spring.stiffness = SpringForce.STIFFNESS_LOW
+            setStartValue(0.7f)
+            start()
+        }
+        SpringAnimation(emojiView, SpringAnimation.SCALE_Y, 1f).apply {
+            spring.dampingRatio = SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY
+            spring.stiffness = SpringForce.STIFFNESS_LOW
+            setStartValue(0.7f)
+            start()
+        }
+    }
+
     private fun openStatsCalendar() {
-        startActivity(Intent(this, StatsActivity::class.java))
+        startActivity(Intent(this, DashboardActivity::class.java))
     }
 }
 
 // Data class
-data class HistoryItem(val date: String, val count: Int, val dateObject: Date)
+data class HistoryItem(
+    val date: String,
+    val cbdCount: Int,
+    val thcCount: Int,
+    val dateObject: Date
+) {
+    val totalCount: Int get() = cbdCount + thcCount
+}
 
 // Adapter
 class ImprovedHistoryAdapter(
     private val historyList: List<HistoryItem>,
-    private val onDayClick: (String) -> Unit
+    private val onDayClick: (String) -> Unit,
+    private val fragmentManager: androidx.fragment.app.FragmentManager? = null
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -848,11 +994,14 @@ class ImprovedHistoryAdapter(
 
     class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val dateText: TextView = itemView.findViewById(R.id.historyDate)
-        val countText: TextView = itemView.findViewById(R.id.historyCount)
+        val countText: TextView = itemView.findViewById(R.id.historyCount)  // Oculto
+        val cbdChip: TextView = itemView.findViewById(R.id.cbdChip)
+        val thcChip: TextView = itemView.findViewById(R.id.thcChip)
         val emojiText: TextView = itemView.findViewById(R.id.historyEmoji)
         val progressBar: View = itemView.findViewById(R.id.progressBar)
         val noteBadge: TextView? = itemView.findViewById(R.id.noteBadge)
         val audioBadge: TextView? = itemView.findViewById(R.id.audioBadge)
+        val voiceNoteButton: android.widget.ImageButton? = itemView.findViewById(R.id.voiceNoteButton)
     }
     class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val headerText: TextView = itemView.findViewById(R.id.headerText)
@@ -875,36 +1024,83 @@ class ImprovedHistoryAdapter(
                 val dayFormat = SimpleDateFormat("EEEE dd", Locale("es", "ES"))
                 holder.dateText.text = dayFormat.format(item.dateObject)
                     .replaceFirstChar { it.uppercase() }
-                holder.countText.text = "${item.count} CBD"
 
-                holder.emojiText.text = EmojiUtils.emojiForCount(item.count, holder.itemView.context)
+                // Mostrar chips según los datos
+                if (item.cbdCount > 0) {
+                    holder.cbdChip.text = "${item.cbdCount} CBD"
+                    holder.cbdChip.visibility = View.VISIBLE
+                } else {
+                    holder.cbdChip.visibility = View.GONE
+                }
 
-                // Barra de progreso (como ya tenías)
+                if (item.thcCount > 0) {
+                    holder.thcChip.text = "${item.thcCount} THC"
+                    holder.thcChip.visibility = View.VISIBLE
+                } else {
+                    holder.thcChip.visibility = View.GONE
+                }
+
+                // Si ambos son 0, mostrar chip CBD con 0
+                if (item.cbdCount == 0 && item.thcCount == 0) {
+                    holder.cbdChip.text = "0 CBD"
+                    holder.cbdChip.visibility = View.VISIBLE
+                }
+
+                val total = item.totalCount
+                holder.emojiText.text = EmojiUtils.emojiForCount(total, holder.itemView.context)
+
+                // Barra de progreso basada en el total
                 val maxWidth = holder.itemView.width
-                val progress = minOf(item.count / 10f, 1f)
+                val progress = minOf(total / 10f, 1f)
                 val layoutParams = holder.progressBar.layoutParams
                 layoutParams.width = (maxWidth * progress).toInt()
                 holder.progressBar.layoutParams = layoutParams
-                val color = when {
-                    item.count == 0 -> R.color.green_safe
-                    item.count <= 3 -> R.color.yellow_warning
-                    item.count <= 6 -> R.color.orange_danger
-                    else -> R.color.red_critical
+
+                // Color de la barra: del mayor, o verde si es 0
+                val barColor = when {
+                    total == 0 -> R.color.green_safe
+                    item.thcCount > item.cbdCount -> {
+                        // THC es mayor, usar escala verde
+                        when {
+                            total <= 4 -> R.color.thc_primary_light
+                            total <= 6 -> R.color.orange_danger
+                            else -> R.color.red_critical
+                        }
+                    }
+                    else -> {
+                        // CBD es mayor o igual, usar escala azul
+                        when {
+                            total <= 4 -> R.color.primary_light
+                            total <= 6 -> R.color.orange_danger
+                            else -> R.color.red_critical
+                        }
+                    }
                 }
                 holder.progressBar.setBackgroundColor(
-                    ContextCompat.getColor(holder.itemView.context, color)
+                    ContextCompat.getColor(holder.itemView.context, barColor)
                 )
 
-                // --- NUEVO: badge de nota visible si existe nota para ese día
+                // Badge de nota visible si existe nota para ese día
                 val ctx = holder.itemView.context
                 holder.noteBadge?.visibility =
                     if (Prefs.hasNote(ctx, item.date)) View.VISIBLE else View.GONE
 
-                // --- NUEVO: badge de audio visible si existe audio para ese día
+                // Badge de audio visible si existe audio para ese día
                 holder.audioBadge?.visibility =
                     if (Prefs.hasAudio(ctx, item.date)) View.VISIBLE else View.GONE
 
-                // --- NUEVO: clicks para abrir el modal
+                // Botón de nota de voz: alpha según si ya hay grabación
+                holder.voiceNoteButton?.alpha =
+                    if (Prefs.hasVoiceNote(ctx, item.date)) 1f else 0.4f
+                holder.voiceNoteButton?.setOnClickListener {
+                    val fm = fragmentManager
+                        ?: (ctx as? androidx.appcompat.app.AppCompatActivity)?.supportFragmentManager
+                    fm?.let {
+                        VoiceNoteBottomSheet.new(item.date).show(it, "voice_note")
+                    }
+                }
+
+                // Clicks para abrir el modal
                 holder.itemView.setOnClickListener { onDayClick(item.date) }
                 holder.noteBadge?.setOnClickListener { onDayClick(item.date) }
                 holder.audioBadge?.setOnClickListener { onDayClick(item.date) }

@@ -3,16 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background">
+    android:background="@color/m3_surface"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/statsToolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/gradient_header"
+        android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         android:title="@string/stats_title"
         android:titleTextColor="@color/white"
+        android:fitsSystemWindows="true"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -81,7 +83,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="L"
+            android:text="@string/cal_day_mon"
             android:textColor="@color/calendar_header_text"
             android:textStyle="bold" />
 
@@ -91,7 +93,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="M"
+            android:text="@string/cal_day_tue"
             android:textColor="@color/calendar_header_text"
             android:textStyle="bold" />
 
@@ -101,7 +103,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="X"
+            android:text="@string/cal_day_wed"
             android:textColor="@color/calendar_header_text"
             android:textStyle="bold" />
 
@@ -111,7 +113,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="J"
+            android:text="@string/cal_day_thu"
             android:textColor="@color/calendar_header_text"
             android:textStyle="bold" />
 
@@ -121,7 +123,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="V"
+            android:text="@string/cal_day_fri"
             android:textColor="@color/calendar_header_text"
             android:textStyle="bold" />
 
@@ -131,7 +133,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="S"
+            android:text="@string/cal_day_sat"
             android:textColor="@color/calendar_header_text"
             android:textStyle="bold" />
 
@@ -141,7 +143,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="D"
+            android:text="@string/cal_day_sun"
             android:textColor="@color/calendar_header_text"
             android:textStyle="bold" />
     </LinearLayout>
@@ -164,9 +166,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="24dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:orientation="vertical"
-        android:padding="12dp"
+        android:padding="8dp"
         android:background="@drawable/rounded_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -176,7 +178,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Leyenda"
+            android:text="@string/legend_title"
             android:textSize="12sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"
@@ -187,7 +189,7 @@
             android:id="@+id/btnEvolution"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ver Evolución 📈"
+            android:text="@string/view_evolution"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="8dp"
             style="@style/Widget.MaterialComponents.Chip.Action"
@@ -211,11 +213,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_margin="3dp"
+                android:layout_margin="2dp"
                 android:text="😌  0"
-                android:textSize="14sp"
+                android:textSize="11sp"
                 android:textColor="@color/text_primary"
-                android:padding="8dp"
+                android:padding="4dp"
                 android:gravity="start|center_vertical"
                 android:background="@drawable/legend_item_safe" />
 
@@ -224,11 +226,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_margin="3dp"
+                android:layout_margin="2dp"
                 android:text="🙂  1-2"
-                android:textSize="14sp"
+                android:textSize="11sp"
                 android:textColor="@color/text_primary"
-                android:padding="8dp"
+                android:padding="4dp"
                 android:gravity="start|center_vertical"
                 android:background="@drawable/legend_item_safe" />
 
@@ -238,11 +240,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_margin="3dp"
+                android:layout_margin="2dp"
                 android:text="😄  3-4"
-                android:textSize="14sp"
+                android:textSize="11sp"
                 android:textColor="@color/text_primary"
-                android:padding="8dp"
+                android:padding="4dp"
                 android:gravity="start|center_vertical"
                 android:background="@drawable/legend_item_moderate" />
 
@@ -251,11 +253,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_margin="3dp"
+                android:layout_margin="2dp"
                 android:text="🫠  5"
-                android:textSize="14sp"
+                android:textSize="11sp"
                 android:textColor="@color/text_primary"
-                android:padding="8dp"
+                android:padding="4dp"
                 android:gravity="start|center_vertical"
                 android:background="@drawable/legend_item_moderate" />
 
@@ -265,11 +267,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_margin="3dp"
+                android:layout_margin="2dp"
                 android:text="🤔  6"
-                android:textSize="14sp"
+                android:textSize="11sp"
                 android:textColor="@color/text_primary"
-                android:padding="8dp"
+                android:padding="4dp"
                 android:gravity="start|center_vertical"
                 android:background="@drawable/legend_item_high" />
 
@@ -278,11 +280,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_margin="3dp"
+                android:layout_margin="2dp"
                 android:text="🙄  7"
-                android:textSize="14sp"
+                android:textSize="11sp"
                 android:textColor="@color/text_primary"
-                android:padding="8dp"
+                android:padding="4dp"
                 android:gravity="start|center_vertical"
                 android:background="@drawable/legend_item_high" />
 
@@ -292,11 +294,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_margin="3dp"
+                android:layout_margin="2dp"
                 android:text="😶‍🌫️  8"
-                android:textSize="14sp"
+                android:textSize="11sp"
                 android:textColor="@color/text_primary"
-                android:padding="8dp"
+                android:padding="4dp"
                 android:gravity="start|center_vertical"
                 android:background="@drawable/legend_item_high" />
 
@@ -305,11 +307,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_margin="3dp"
+                android:layout_margin="2dp"
                 android:text="🫡  9"
-                android:textSize="14sp"
+                android:textSize="11sp"
                 android:textColor="@color/text_primary"
-                android:padding="8dp"
+                android:padding="4dp"
                 android:gravity="start|center_vertical"
                 android:background="@drawable/legend_item_danger" />
 
@@ -319,11 +321,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_margin="3dp"
+                android:layout_margin="2dp"
                 android:text="🫥  10"
-                android:textSize="14sp"
+                android:textSize="11sp"
                 android:textColor="@color/text_primary"
-                android:padding="8dp"
+                android:padding="4dp"
                 android:gravity="start|center_vertical"
                 android:background="@drawable/legend_item_danger" />
 
@@ -332,11 +334,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:layout_margin="3dp"
+                android:layout_margin="2dp"
                 android:text="⛔️  11"
-                android:textSize="14sp"
+                android:textSize="11sp"
                 android:textColor="@color/text_primary"
-                android:padding="8dp"
+                android:padding="4dp"
                 android:gravity="start|center_vertical"
                 android:background="@drawable/legend_item_danger" />
 
@@ -347,11 +349,11 @@
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
                 android:layout_columnSpan="2"
-                android:layout_margin="3dp"
+                android:layout_margin="2dp"
                 android:text="💀  12+"
-                android:textSize="14sp"
+                android:textSize="11sp"
                 android:textColor="@color/text_primary"
-                android:padding="8dp"
+                android:padding="4dp"
                 android:gravity="center"
                 android:background="@drawable/legend_item_critical" />
 

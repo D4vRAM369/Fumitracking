@@ -145,19 +145,20 @@ class LineChartView @JvmOverloads constructor(
         canvas.drawPath(pathLine, paintLine)
 
         // Draw Dots and Labels
-        val labelSkip = if (dataPoints.size > 10) 5 else 1
-        
+        val labelSkip = when {
+            dataPoints.size > 30 -> 7
+            dataPoints.size > 10 -> 5
+            else -> 1
+        }
+
         points.forEachIndexed { index, (x, y) ->
             // Draw Dot
             canvas.drawCircle(x, y, 12f, paintDot)
             canvas.drawCircle(x, y, 6f, paintDotInner)
 
-            // Draw Value Text (only for non-skipped or peaks?)
-            // Let's draw all values for now but slightly offset
-            canvas.drawText(dataPoints[index].second.toString(), x, y - 25, paintText)
-
-            // Draw X-Axis Label (Date) with skipping
+            // Draw Value and X-Axis labels with same skip
             if (index % labelSkip == 0 || index == points.size - 1) {
+                canvas.drawText(dataPoints[index].second.toString(), x, y - 25, paintText)
                 canvas.drawText(dataPoints[index].first, x, height - paddingBottom + 50, paintText)
             }
         }

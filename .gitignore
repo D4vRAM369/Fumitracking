@@ -1,42 +1,33 @@
-# Gradle
-.gradle/
-build/
-
-# Local config
-local.properties
-
-# Output
-*.aab
-*.apk
-output-metadata.json
 
 # Android Studio / IntelliJ
-*.iml
-.idea/
-
-# NDK / C++
-captures/
-.externalNativeBuild/
-.cxx/
-
+# Gradle
 # Keys / services
+# Local config
+# Logs & profiling
+# NDK / C++
+# OS
+# Output
+# Sesiones PBL (Learning/Aprendizaje)
+docs/
+*.aab
+*.apk
+build/
+captures/
+.cxx/
+.DS_Store
+.externalNativeBuild/
+google-services.json
+.gradle/
+*.hprof
+.idea/
+*.iml
 *.jks
 *.keystore
 keystore.properties
-google-services.json
-
-# Logs & profiling
+local.properties
 *.log
-*.hprof
-
-# OS
-.DS_Store
-Thumbs.db
-
-*.keystore
-
-# Sesiones PBL (Learning/Aprendizaje)
 markdown/
 
-
 .omx/
+output-metadata.json
+Thumbs.db

@@ -1,34 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Widget CBDcounter v1.5 — Material Expressive 3, target 2×2
+  Presupuesto vertical (cell típica 80dp × 2 ≈ 160dp):
+    padding 10+8 = 18dp reservados
+    ┌─ Header (fecha + badge) +2dp margin : 18dp
+    ├─ Emoji 14sp                          : 18dp
+    ├─ Contador 26sp         +3dp margin  : 37dp
+    ├─ Botones fila 1        +4dp margin  : 32dp
+    └─ Botones fila 2                     : 28dp
+    Total contenido: 133dp + 18dp padding = 151dp ✓ sin clipping
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/widget_background"
-    android:padding="16dp"
-    android:gravity="center">
+    android:background="@drawable/widget_bg_me3"
+    android:paddingHorizontal="11dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="8dp"
+    android:gravity="center_horizontal">
 
-    <!-- Fecha -->
-    <TextView
-        android:id="@+id/widget_date"
-        android:layout_width="wrap_content"
+    <!-- ── Header: fecha izq + badge modo activo der ── -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="01/08"
-        android:textColor="#FFFFFF"
-        android:textSize="10sp"
-        android:layout_marginBottom="2dp"
-        android:alpha="0.9" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="2dp">
 
-    <!-- Emoji -->
+        <TextView
+            android:id="@+id/widget_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="01/08"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
+            android:alpha="0.70" />
+
+        <!-- Pill badge CBD / THC (reemplaza la etiqueta "CBD" cortada del layout anterior) -->
+        <TextView
+            android:id="@+id/widget_mode_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CBD"
+            android:textColor="#FFFFFF"
+            android:textSize="8sp"
+            android:textStyle="bold"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="2dp"
+            android:background="@drawable/widget_badge_bg" />
+    </LinearLayout>
+
+    <!-- ── Emoji estado — compact type scale 14sp ── -->
     <TextView
         android:id="@+id/widget_emoji"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="😌"
-        android:textSize="16sp"
-        android:layout_marginBottom="0dp" />
+        android:textSize="14sp" />
 
-    <!-- Contador principal -->
+    <!-- ── Contador total — 26sp, igual que el original (sin clipping) ── -->
     <TextView
         android:id="@+id/widget_counter"
         android:layout_width="wrap_content"
@@ -37,87 +70,87 @@
         android:textColor="#FFFFFF"
         android:textSize="26sp"
         android:textStyle="bold"
-        android:layout_marginBottom="4dp" />
+        android:layout_marginBottom="3dp" />
 
-    <!-- Botones (Grid 2x2) -->
-    <LinearLayout
+    <!-- Sub-línea CBD · THC oculta en el layout 2×2 para no exceder el presupuesto vertical.
+         Se mantiene en el árbol de vistas para que el Provider pueda actualizarla sin NPE
+         cuando en el futuro se use un layout responsive para tamaños mayores. -->
+    <TextView
+        android:id="@+id/widget_sub_counts"
         android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:text="CBD 0 · THC 0"
+        android:textColor="#FFFFFF"
+        android:textSize="9sp"
+        android:alpha="0.00"
+        android:visibility="gone" />
+
+    <!-- ── Grid 2×2 de botones — ancho completo con weight ── -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center"
-        android:layout_marginTop="0dp">
+        android:gravity="center">
 
-        <!-- Fila Superior: Weed | Reset -->
+        <!-- Fila 1: 🌿 Weed | ↺ Reset -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="2dp">
+            android:layout_marginBottom="4dp">
 
             <TextView
                 android:id="@+id/widget_btn_weed"
-                android:layout_width="34dp"
-                android:layout_height="34dp"
+                android:layout_width="0dp"
+                android:layout_height="28dp"
+                android:layout_weight="1"
                 android:text="🌿"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textSize="13sp"
                 android:gravity="center"
-                android:background="@drawable/widget_button_square_weed"
-                android:layout_marginRight="2dp" />
+                android:background="@drawable/widget_btn_me3_weed"
+                android:layout_marginEnd="4dp" />
 
             <TextView
                 android:id="@+id/widget_reset_button"
-                android:layout_width="34dp"
-                android:layout_height="34dp"
-                android:text="↻"
+                android:layout_width="0dp"
+                android:layout_height="28dp"
+                android:layout_weight="1"
+                android:text="↺"
                 android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:textStyle="bold"
+                android:textSize="15sp"
                 android:gravity="center"
-                android:background="@drawable/widget_button_square_reset" />
+                android:background="@drawable/widget_btn_me3_reset" />
         </LinearLayout>
 
-        <!-- Fila Inferior: Polem | +1 -->
+        <!-- Fila 2: 🍫 Polem | +1 -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/widget_btn_polem"
-                android:layout_width="34dp"
-                android:layout_height="34dp"
+                android:layout_width="0dp"
+                android:layout_height="28dp"
+                android:layout_weight="1"
                 android:text="🍫"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textSize="13sp"
                 android:gravity="center"
-                android:background="@drawable/widget_button_square_polem"
-                android:layout_marginRight="2dp" />
+                android:background="@drawable/widget_btn_me3_polem"
+                android:layout_marginEnd="4dp" />
 
             <TextView
                 android:id="@+id/widget_add_button"
-                android:layout_width="34dp"
-                android:layout_height="34dp"
+                android:layout_width="0dp"
+                android:layout_height="28dp"
+                android:layout_weight="1"
                 android:text="+1"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp"
+                android:textColor="#6750A4"
+                android:textSize="12sp"
                 android:textStyle="bold"
                 android:gravity="center"
-                android:background="@drawable/widget_button_square_add" />
+                android:background="@drawable/widget_btn_me3_add" />
         </LinearLayout>
-
     </LinearLayout>
-
-    <!-- Etiqueta CBD -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/cbd"
-        android:textColor="#FFFFFF"
-        android:textSize="10sp"
-        android:layout_marginTop="4dp"
-        android:alpha="0.8" />
 
 </LinearLayout>

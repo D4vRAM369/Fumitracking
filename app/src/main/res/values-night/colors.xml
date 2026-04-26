@@ -41,8 +41,28 @@
     <color name="io_action_icon_tint">@color/white</color>
 
     <!-- colores para el gradient_header-->
-    <color name="gradient_start">#1A1A2E</color>  <!-- tus azules oscuros -->
+    <color name="gradient_start">#1A1A2E</color>
     <color name="gradient_end">#16213E</color>
 
+    <!-- ===== M3 Semantic tokens — DARK (noche) ===== -->
+    <color name="m3_surface">#141218</color>
+    <color name="m3_surface_variant">#2B2930</color>
+    <color name="m3_on_surface">#E6E1E5</color>
+    <color name="m3_on_surface_variant">#CAC4D0</color>
+    <color name="m3_outline">#938F99</color>
+
+    <!-- ===== Dashboard cards — ME3 Expressive DARK ===== -->
+    <!-- Hoy: azul marino profundo -->
+    <color name="card_today_bg">#1E3A5F</color>
+    <color name="card_today_value">#93C5FD</color>
+    <!-- Semana: naranja tostado oscuro -->
+    <color name="card_week_bg">#431407</color>
+    <color name="card_week_value">#FED7AA</color>
+    <!-- Promedio: verde bosque oscuro -->
+    <color name="card_avg_bg">#064E3B</color>
+    <color name="card_avg_value">#6EE7B7</color>
+    <!-- Racha: púrpura profundo -->
+    <color name="card_streak_bg">#2E1065</color>
+    <color name="card_streak_value">#C4B5FD</color>
 
 </resources>

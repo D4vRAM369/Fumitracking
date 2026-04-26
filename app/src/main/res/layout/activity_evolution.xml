@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background">
+    android:background="@color/background"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/evolutionToolbar"
@@ -11,8 +12,9 @@
         android:layout_height="wrap_content"
         android:background="@drawable/gradient_header"
         android:minHeight="?attr/actionBarSize"
-        android:title="Evolución"
+        android:title="@string/evolution_title_toolbar"
         android:titleTextColor="@color/white"
+        android:fitsSystemWindows="true"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -48,7 +50,7 @@
         android:id="@+id/evolutionTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Últimos 7 días"
+        android:text="@string/evolution_title_default"
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="@color/text_primary"
@@ -82,16 +84,32 @@
             android:id="@+id/chip7Days"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="7 Días"
+            android:text="@string/chip_7_days"
             android:checkable="true"
             android:checked="true"
+            style="@style/Widget.MaterialComponents.Chip.Choice" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip14Days"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/chip_14_days"
+            android:checkable="true"
             style="@style/Widget.MaterialComponents.Chip.Choice" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chip30Days"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="30 Días"
+            android:text="@string/chip_30_days"
+            android:checkable="true"
+            style="@style/Widget.MaterialComponents.Chip.Choice" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip60Days"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/chip_60_days"
             android:checkable="true"
             style="@style/Widget.MaterialComponents.Chip.Choice" />
 

@@ -1,6 +1,5 @@
 package com.d4vram.cbdcounter
 
-import android.content.Context
 import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.TextView
@@ -26,6 +25,8 @@ class EvolutionActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_evolution)
 
+        window.statusBarColor = getColor(R.color.gradient_start)
+
         val toolbar = findViewById<MaterialToolbar>(R.id.evolutionToolbar)
         toolbar.setNavigationOnClickListener { finish() }
 
@@ -47,12 +48,10 @@ class EvolutionActivity : AppCompatActivity() {
 
         rangeChipGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
-                R.id.chip7Days -> {
-                    rangeDays = 7
-                }
-                R.id.chip30Days -> {
-                    rangeDays = 30
-                }
+                R.id.chip7Days -> rangeDays = 7
+                R.id.chip14Days -> rangeDays = 14
+                R.id.chip30Days -> rangeDays = 30
+                R.id.chip60Days -> rangeDays = 60
             }
             offsetDays = 0 // reset to today when range changes
             loadData(rangeDays, offsetDays)
@@ -63,8 +62,10 @@ class EvolutionActivity : AppCompatActivity() {
     }
 
     private fun loadData(days: Int, offset: Int) {
-        evolutionTitle.text = "Últimos $days días"
-        val sharedPrefs = getSharedPreferences("CBDCounter", Context.MODE_PRIVATE)
+        evolutionTitle.text = if (offset == 0)
+            getString(R.string.evolution_last_n_days, days)
+        else
+            getString(R.string.evolution_ago_range, offset, offset + days)
         val dataPoints = mutableListOf<Pair<String, Int>>()
         val calendar = Calendar.getInstance()
         // Move back 'offset' days from today
@@ -75,8 +76,7 @@ class EvolutionActivity : AppCompatActivity() {
         for (i in 0 until days) {
             val dateKey = dateKeyFormat.format(calendar.time)
             val label = labelFormat.format(calendar.time)
-            val prefKey = "count_$dateKey"
-            val count = sharedPrefs.getInt(prefKey, 0)
+            val count = Prefs.getTotalCount(this, dateKey)
             dataPoints.add(Pair(label, count))
             calendar.add(Calendar.DAY_OF_YEAR, 1)
         }
