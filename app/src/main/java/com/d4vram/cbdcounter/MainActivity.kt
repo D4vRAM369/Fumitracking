@@ -165,6 +165,7 @@ class MainActivity : AppCompatActivity() {
         // Actualizar emoji cuando se vuelve de EmojiSettingsActivity
         loadTodayData()
         updateDisplay(animate = false)
+        historyAdapter.refresh()
         
         // Registrar receptor para cambios de fecha/hora
         val filter = IntentFilter().apply {
@@ -876,19 +877,7 @@ class ImprovedHistoryAdapter(
                     .replaceFirstChar { it.uppercase() }
                 holder.countText.text = "${item.count} CBD"
 
-                holder.emojiText.text = when {
-                    item.count == 0 -> "😌"
-                    item.count <= 2 -> "🙂"
-                    item.count <= 4 -> "😄"
-                    item.count <= 5 -> "🫠"
-                    item.count <= 6 -> "🤔"
-                    item.count <= 7 -> "🙄"
-                    item.count <= 8 -> "😶‍🌫️"
-                    item.count <= 9 -> "🫡"
-                    item.count <= 10 -> "🫥"
-                    item.count <= 11 -> "⛔️"
-                    else -> "💀"
-                }
+                holder.emojiText.text = EmojiUtils.emojiForCount(item.count, holder.itemView.context)
 
                 // Barra de progreso (como ya tenías)
                 val maxWidth = holder.itemView.width
