@@ -9,6 +9,8 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.WindowInsetsController
 import android.view.LayoutInflater
 import android.view.View
@@ -112,6 +114,17 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
         }
     }
 
+    private val handler = Handler(Looper.getMainLooper())
+    private val midnightReloadRunnable = Runnable {
+        loadTodayData()
+        updateDisplay(animate = false)
+        loadAllHistoryData()
+        updateHistoryView()
+        updateStats()
+        historyAdapter.refresh()
+        scheduleMidnightReload()
+    }
+
     private val importCsvLauncher =
         registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
             runCatching {
@@ -197,16 +210,31 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
             addAction(Intent.ACTION_TIMEZONE_CHANGED)
         }
         registerReceiver(dateChangeReceiver, filter)
+        scheduleMidnightReload()
     }
 
     override fun onPause() {
         super.onPause()
         // Desregistrar receptor para evitar memory leaks
         try {
+            handler.removeCallbacks(midnightReloadRunnable)
             unregisterReceiver(dateChangeReceiver)
         } catch (e: IllegalArgumentException) {
             // Receptor ya desregistrado, ignorar
         }
+    }
+
+    private fun scheduleMidnightReload() {
+        handler.removeCallbacks(midnightReloadRunnable)
+        val midnight = Calendar.getInstance().apply {
+            add(Calendar.DAY_OF_YEAR, 1)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 1)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val delay = midnight.timeInMillis - System.currentTimeMillis()
+        handler.postDelayed(midnightReloadRunnable, delay)
     }
 
     private fun initViews() {
