@@ -168,7 +168,8 @@ class CalendarActivity : AppCompatActivity(), NoteBottomSheet.Listener {
                 todayCalendar.get(Calendar.MONTH) == currentMonth &&
                 todayCalendar.get(Calendar.YEAR) == currentYear
 
-            items.add(CalendarCell.Day(day, emoji, hasData, isToday))
+            val totalCount = Prefs.getCbdCount(this, dateKey) + Prefs.getThcCount(this, dateKey)
+            items.add(CalendarCell.Day(day, emoji, hasData, isToday, totalCount))
         }
 
         while (items.size % 7 != 0) {
@@ -189,7 +190,8 @@ class CalendarActivity : AppCompatActivity(), NoteBottomSheet.Listener {
             val number: Int,
             val emoji: String,
             val hasData: Boolean,
-            val isToday: Boolean
+            val isToday: Boolean,
+            val totalCount: Int = 0
         ) : CalendarCell()
     }
 
@@ -251,13 +253,15 @@ class CalendarActivity : AppCompatActivity(), NoteBottomSheet.Listener {
                             else -> 0.45f
                         }
                         dayEmoji.visibility = if (cell.hasData && cell.emoji.isNotBlank()) View.VISIBLE else View.INVISIBLE
-                        dayContainer.background = if (cell.isToday) {
-                            androidx.appcompat.content.res.AppCompatResources.getDrawable(
+                        if (cell.isToday) {
+                            dayContainer.background = androidx.appcompat.content.res.AppCompatResources.getDrawable(
                                 itemView.context,
                                 R.drawable.bg_calendar_today
                             )
+                        } else if (cell.hasData) {
+                            dayContainer.setBackgroundColor(HeatmapUtils.colorForCount(cell.totalCount))
                         } else {
-                            null
+                            dayContainer.background = null
                         }
                     }
                 }
