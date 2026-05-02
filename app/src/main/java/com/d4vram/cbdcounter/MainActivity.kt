@@ -383,6 +383,7 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
         updateHistoryView()
         updateStats()
         CBDWidgetProvider.updateAllWidgets(this)
+        GoalsActivity.notifyIfGoalExceeded(this, cbdCount, thcCount)
     }
 
     private fun isDarkModeEnabled(): Boolean {
