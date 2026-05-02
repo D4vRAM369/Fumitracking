@@ -102,7 +102,8 @@ object BackupManager {
                 java.util.zip.ZipInputStream(inputStream).use { zis ->
                     var entry = zis.nextEntry
                     while (entry != null) {
-                        val file = File(tempDir, entry.name)
+                        val file = safeZipTarget(tempDir, entry.name)
+                            ?: throw IllegalArgumentException("Entrada ZIP no segura: ${entry.name}")
                         if (entry.isDirectory) {
                             file.mkdirs()
                         } else {
@@ -162,6 +163,19 @@ object BackupManager {
             return false
         } finally {
             tempDir.deleteRecursively()
+        }
+    }
+
+    internal fun safeZipTarget(tempDir: File, entryName: String): File? {
+        val root = tempDir.canonicalFile
+        val target = File(root, entryName).canonicalFile
+        val rootPath = root.path
+        val targetPath = target.path
+
+        return if (targetPath == rootPath || targetPath.startsWith(rootPath + File.separator)) {
+            target
+        } else {
+            null
         }
     }
 
