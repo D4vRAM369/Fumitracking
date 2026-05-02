@@ -94,17 +94,22 @@ class VoiceNoteBottomSheet : BottomSheetDialogFragment() {
                 start()
             }
             isRecording = true
-            btn.text = "💾 Guardar"
+            btn.setText(R.string.voice_note_save)
             wave.visibility = View.VISIBLE
-            Toast.makeText(context, "Grabando…", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.voice_note_recording), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
-            Toast.makeText(context, "Error al iniciar grabación: ${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                context,
+                getString(R.string.voice_note_error_start, e.message ?: ""),
+                Toast.LENGTH_SHORT
+            ).show()
             recorder?.release()
             recorder = null
         }
     }
 
     @Deprecated("Deprecated in Java")
+    @Suppress("DEPRECATION")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -118,7 +123,7 @@ class VoiceNoteBottomSheet : BottomSheetDialogFragment() {
                 val wave = waveRef ?: return
                 startRecording(audioPath, btn, wave)
             } else {
-                Toast.makeText(context, "Permiso de micrófono denegado", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.voice_note_microphone_denied), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -135,11 +140,11 @@ class VoiceNoteBottomSheet : BottomSheetDialogFragment() {
         }
         recorder = null
         isRecording = false
-        btn.text = "🎙️ Grabar"
+        btn.setText(R.string.voice_note_record)
         wave.visibility = View.GONE
         btnPlay.visibility = View.VISIBLE
         btnDelete.visibility = View.VISIBLE
-        Toast.makeText(context, "Nota de voz guardada", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, getString(R.string.voice_note_saved), Toast.LENGTH_SHORT).show()
         (activity as? Listener)?.onVoiceNoteChanged(dateArg)
     }
 
@@ -152,7 +157,7 @@ class VoiceNoteBottomSheet : BottomSheetDialogFragment() {
                 start()
             }
         } catch (e: Exception) {
-            Toast.makeText(context, "Error al reproducir audio", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.voice_note_error_play), Toast.LENGTH_SHORT).show()
         }
     }
 

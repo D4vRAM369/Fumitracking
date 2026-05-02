@@ -153,6 +153,27 @@
     <string name="view_evolution">Ver Evolución 📈</string>
     <string name="no_data">Sin datos</string>
 
+    <!-- i18n: voice notes / audio recording -->
+    <string name="voice_note_record">🎙️ Grabar</string>
+    <string name="voice_note_save">💾 Guardar</string>
+    <string name="voice_note_record_audio">Grabar Audio</string>
+    <string name="voice_note_stop_recording">Detener Grabación</string>
+    <string name="voice_note_recording">Grabando…</string>
+    <string name="voice_note_recording_plain">Grabando...</string>
+    <string name="voice_note_available">Audio grabado disponible</string>
+    <string name="voice_note_stopped">Grabación detenida</string>
+    <string name="voice_note_started">Grabación iniciada</string>
+    <string name="voice_note_saved">Nota de voz guardada</string>
+    <string name="voice_note_recording_saved">Grabación guardada</string>
+    <string name="voice_note_deleted">Audio borrado</string>
+    <string name="voice_note_microphone_denied">Permiso de micrófono denegado</string>
+    <string name="voice_note_recording_denied">Permiso de grabación denegado</string>
+    <string name="voice_note_error_start">Error al iniciar grabación: %1$s</string>
+    <string name="voice_note_error_start_with_cause">Error al iniciar grabación: %1$s (Código: %2$s)</string>
+    <string name="voice_note_error_stop">Error al detener grabación: %1$s</string>
+    <string name="voice_note_error_load">Error al cargar audio: %1$s</string>
+    <string name="voice_note_error_play">Error al reproducir audio</string>
+
     <!-- i18n: Days of week array (Sun=0 … Sat=6, Calendar.DAY_OF_WEEK order) -->
     <string-array name="days_of_week">
         <item>Domingo</item>

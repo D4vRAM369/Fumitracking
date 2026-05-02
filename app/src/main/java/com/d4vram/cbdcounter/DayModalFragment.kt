@@ -114,7 +114,7 @@ class DayModalFragment : DialogFragment() {
             // Check if audio exists
             audioFile = VoiceNoteRepository.existingFile(requireContext(), d)
             if (audioFile != null) {
-                audioStatus.text = "Audio grabado disponible"
+                audioStatus.setText(R.string.voice_note_available)
                 seekBarContainer.visibility = View.VISIBLE
                 audioControlsLayout.visibility = View.VISIBLE
                 setupAudioPlayer(audioFile!!)
@@ -127,13 +127,13 @@ class DayModalFragment : DialogFragment() {
  recordAudioButton.setOnClickListener {
             if (isRecording) {
                 stopRecording()
-                recordAudioButton.text = "Grabar Audio"
-                audioStatus.text = "Grabación detenida"
+                recordAudioButton.setText(R.string.voice_note_record_audio)
+                audioStatus.setText(R.string.voice_note_stopped)
                 
                 // Si se guardó el archivo, cargarlo
                 audioFile?.let { file ->
                     if (file.exists()) {
-                        audioStatus.text = "Audio grabado disponible"
+                        audioStatus.setText(R.string.voice_note_available)
                         seekBarContainer.visibility = View.VISIBLE
                         audioControlsLayout.visibility = View.VISIBLE
                         setupAudioPlayer(file)
@@ -141,8 +141,8 @@ class DayModalFragment : DialogFragment() {
                 }
             } else {
                 startRecording()
-                recordAudioButton.text = "Detener Grabación"
-                audioStatus.text = "Grabando..."
+                recordAudioButton.setText(R.string.voice_note_stop_recording)
+                audioStatus.setText(R.string.voice_note_recording_plain)
                 seekBarContainer.visibility = View.VISIBLE
                 audioControlsLayout.visibility = View.GONE
             }
@@ -162,7 +162,7 @@ class DayModalFragment : DialogFragment() {
             audioStatus.text = ""
             seekBarContainer.visibility = View.GONE
             audioControlsLayout.visibility = View.GONE
-            Toast.makeText(context, "Audio borrado", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.voice_note_deleted), Toast.LENGTH_SHORT).show()
         }
 
 
@@ -206,9 +206,13 @@ class DayModalFragment : DialogFragment() {
                 isRecording = true
                 recordStartTime = System.currentTimeMillis()
                 startRecordingProgressUpdate()
-                Toast.makeText(context, "Grabación iniciada", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.voice_note_started), Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
-                Toast.makeText(context, "Error al iniciar grabación: ${e.message} (Código: ${e.cause})", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    context,
+                    getString(R.string.voice_note_error_start_with_cause, e.message ?: "", e.cause ?: ""),
+                    Toast.LENGTH_LONG
+                ).show()
                 e.printStackTrace()
             }
         }
@@ -224,20 +228,26 @@ class DayModalFragment : DialogFragment() {
                 mediaRecorder = null
                 isRecording = false
                 stopProgressUpdates()
-                Toast.makeText(context, "Grabación guardada", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.voice_note_recording_saved), Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
-                Toast.makeText(context, "Error al detener grabación: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    getString(R.string.voice_note_error_stop, e.message ?: ""),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
 
+    @Deprecated("Deprecated in Java")
+    @Suppress("DEPRECATION")
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startRecording()
             } else {
-                Toast.makeText(context, "Permiso de grabación denegado", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.voice_note_recording_denied), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -264,7 +274,11 @@ class DayModalFragment : DialogFragment() {
             audioSeekBar.progress = 0
             
         } catch (e: Exception) {
-            Toast.makeText(context, "Error al cargar audio: ${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                context,
+                getString(R.string.voice_note_error_load, e.message ?: ""),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 

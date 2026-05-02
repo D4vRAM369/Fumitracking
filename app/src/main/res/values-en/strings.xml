@@ -153,6 +153,27 @@
     <string name="view_evolution">View Evolution 📈</string>
     <string name="no_data">No data</string>
 
+    <!-- Voice notes / audio recording -->
+    <string name="voice_note_record">🎙️ Record</string>
+    <string name="voice_note_save">💾 Save</string>
+    <string name="voice_note_record_audio">Record Audio</string>
+    <string name="voice_note_stop_recording">Stop Recording</string>
+    <string name="voice_note_recording">Recording…</string>
+    <string name="voice_note_recording_plain">Recording...</string>
+    <string name="voice_note_available">Recorded audio available</string>
+    <string name="voice_note_stopped">Recording stopped</string>
+    <string name="voice_note_started">Recording started</string>
+    <string name="voice_note_saved">Voice note saved</string>
+    <string name="voice_note_recording_saved">Recording saved</string>
+    <string name="voice_note_deleted">Audio deleted</string>
+    <string name="voice_note_microphone_denied">Microphone permission denied</string>
+    <string name="voice_note_recording_denied">Recording permission denied</string>
+    <string name="voice_note_error_start">Error starting recording: %1$s</string>
+    <string name="voice_note_error_start_with_cause">Error starting recording: %1$s (Code: %2$s)</string>
+    <string name="voice_note_error_stop">Error stopping recording: %1$s</string>
+    <string name="voice_note_error_load">Error loading audio: %1$s</string>
+    <string name="voice_note_error_play">Error playing audio</string>
+
     <!-- Days of week array (Sun=0 … Sat=6, Calendar.DAY_OF_WEEK order) -->
     <string-array name="days_of_week">
         <item>Sunday</item>
