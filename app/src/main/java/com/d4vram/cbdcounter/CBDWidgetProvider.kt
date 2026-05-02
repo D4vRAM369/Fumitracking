@@ -5,6 +5,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
+import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -109,22 +110,6 @@ class CBDWidgetProvider : AppWidgetProvider() {
 
         runCatching {
             when (intent.action) {
-                ACTION_ADD_CBD -> {
-                    addStandardCBD(context)
-                    updateAllWidgets(context)
-                }
-                ACTION_ADD_WEED -> {
-                    addWeed(context)
-                    updateAllWidgets(context)
-                }
-                ACTION_ADD_POLEM -> {
-                    addPolem(context)
-                    updateAllWidgets(context)
-                }
-                ACTION_RESET_CBD -> {
-                    resetCBD(context)
-                    updateAllWidgets(context)
-                }
                 AppWidgetManager.ACTION_APPWIDGET_UPDATE -> {
                     val appWidgetManager = AppWidgetManager.getInstance(context)
                     val appWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS)
@@ -178,7 +163,7 @@ class CBDWidgetProvider : AppWidgetProvider() {
         views.setTextColor(R.id.widget_add_button, addTextColor)
 
         // Configurar botón +1
-        val addIntent = Intent(context, CBDWidgetProvider::class.java).apply {
+        val addIntent = Intent(context, CBDWidgetActionReceiver::class.java).apply {
             action = ACTION_ADD_CBD
         }
         val addPendingIntent = PendingIntent.getBroadcast(
@@ -187,7 +172,7 @@ class CBDWidgetProvider : AppWidgetProvider() {
         views.setOnClickPendingIntent(R.id.widget_add_button, addPendingIntent)
 
         // Configurar botón Weed
-        val weedIntent = Intent(context, CBDWidgetProvider::class.java).apply {
+        val weedIntent = Intent(context, CBDWidgetActionReceiver::class.java).apply {
             action = ACTION_ADD_WEED
         }
         val weedPendingIntent = PendingIntent.getBroadcast(
@@ -196,7 +181,7 @@ class CBDWidgetProvider : AppWidgetProvider() {
         views.setOnClickPendingIntent(R.id.widget_btn_weed, weedPendingIntent)
 
         // Configurar botón Polem
-        val polemIntent = Intent(context, CBDWidgetProvider::class.java).apply {
+        val polemIntent = Intent(context, CBDWidgetActionReceiver::class.java).apply {
             action = ACTION_ADD_POLEM
         }
         val polemPendingIntent = PendingIntent.getBroadcast(
@@ -205,7 +190,7 @@ class CBDWidgetProvider : AppWidgetProvider() {
         views.setOnClickPendingIntent(R.id.widget_btn_polem, polemPendingIntent)
 
         // Configurar botón reset
-        val resetIntent = Intent(context, CBDWidgetProvider::class.java).apply {
+        val resetIntent = Intent(context, CBDWidgetActionReceiver::class.java).apply {
             action = ACTION_RESET_CBD
         }
         val resetPendingIntent = PendingIntent.getBroadcast(
@@ -223,35 +208,6 @@ class CBDWidgetProvider : AppWidgetProvider() {
         appWidgetManager.updateAppWidget(appWidgetId, views)
     }
 
-    private fun incrementActiveCounter(context: Context) {
-        val today = getCurrentDateKey()
-        Prefs.incrementActiveCount(context, today)
-    }
-
-    private fun addStandardCBD(context: Context) {
-        incrementActiveCounter(context)
-        val isThc = Prefs.getSubstanceType(context) == "THC"
-        val entry = if (isThc) "🟢 ${getCurrentTimestamp()}" else "🔹 ${getCurrentTimestamp()}"
-        appendNote(context, entry)
-    }
-
-    private fun resetCBD(context: Context) {
-        val today = getCurrentDateKey()
-        // Reset solo el contador del modo activo
-        val isThc = Prefs.getSubstanceType(context) == "THC"
-        if (isThc) {
-            Prefs.setThcCount(context, today, 0)
-        } else {
-            Prefs.setCbdCount(context, today, 0)
-        }
-    }
-
-    private fun getCurrentCount(context: Context): Int {
-        val today = getCurrentDateKey()
-        // Devolver el TOTAL del día (CBD + THC)
-        return Prefs.getTotalCount(context, today)
-    }
-
     private fun getCurrentDateKey(): String {
         val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         return formatter.format(Date())
@@ -261,25 +217,62 @@ class CBDWidgetProvider : AppWidgetProvider() {
         val formatter = SimpleDateFormat("dd/MM", Locale.getDefault())
         return formatter.format(Date())
     }
+}
 
-    private fun addWeed(context: Context) {
-        // Weed siempre suma a THC, independiente del modo activo
-        val today = getCurrentDateKey()
-        Prefs.setThcCount(context, today, Prefs.getThcCount(context, today) + 1)
-        val entry = "🌿 ${getCurrentTimestamp()} (aliñado con weed)"
+class CBDWidgetActionReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        runCatching {
+            when (intent.action) {
+                CBDWidgetProvider.ACTION_ADD_CBD -> WidgetActionHandler.addStandardCBD(context)
+                CBDWidgetProvider.ACTION_ADD_WEED -> WidgetActionHandler.addWeed(context)
+                CBDWidgetProvider.ACTION_ADD_POLEM -> WidgetActionHandler.addPolem(context)
+                CBDWidgetProvider.ACTION_RESET_CBD -> WidgetActionHandler.resetActiveCounter(context)
+                else -> return
+            }
+            CBDWidgetProvider.updateAllWidgets(context)
+        }.onFailure { e ->
+            e.printStackTrace()
+        }
+    }
+}
+
+private object WidgetActionHandler {
+    fun addStandardCBD(context: Context) {
+        val today = currentDateKey()
+        Prefs.incrementActiveCount(context, today)
+        val isThc = Prefs.getSubstanceType(context) == "THC"
+        val entry = if (isThc) "🟢 ${currentTimestamp()}" else "🔹 ${currentTimestamp()}"
         appendNote(context, entry)
     }
 
-    private fun addPolem(context: Context) {
-        // Polen siempre suma a THC, independiente del modo activo
-        val today = getCurrentDateKey()
+    fun addWeed(context: Context) {
+        // Weed siempre suma a THC, independiente del modo activo
+        val today = currentDateKey()
         Prefs.setThcCount(context, today, Prefs.getThcCount(context, today) + 1)
-        val entry = "🍫 ${getCurrentTimestamp()} (aliñado con polen)"
+        val entry = "🌿 ${currentTimestamp()} (aliñado con weed)"
         appendNote(context, entry)
+    }
+
+    fun addPolem(context: Context) {
+        // Polen siempre suma a THC, independiente del modo activo
+        val today = currentDateKey()
+        Prefs.setThcCount(context, today, Prefs.getThcCount(context, today) + 1)
+        val entry = "🍫 ${currentTimestamp()} (aliñado con polen)"
+        appendNote(context, entry)
+    }
+
+    fun resetActiveCounter(context: Context) {
+        val today = currentDateKey()
+        val isThc = Prefs.getSubstanceType(context) == "THC"
+        if (isThc) {
+            Prefs.setThcCount(context, today, 0)
+        } else {
+            Prefs.setCbdCount(context, today, 0)
+        }
     }
 
     private fun appendNote(context: Context, entry: String) {
-        val today = getCurrentDateKey()
+        val today = currentDateKey()
         val currentNote = Prefs.getNote(context, today)
         val updatedNote = if (currentNote.isNullOrBlank()) {
             entry
@@ -289,6 +282,9 @@ class CBDWidgetProvider : AppWidgetProvider() {
         Prefs.setNote(context, today, updatedNote)
     }
 
-    private fun getCurrentTimestamp(): String =
+    private fun currentDateKey(): String =
+        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+
+    private fun currentTimestamp(): String =
         SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
 }

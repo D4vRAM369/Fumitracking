@@ -75,10 +75,6 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.d4vram.cbdcounter.ADD_CBD" />
-                <action android:name="com.d4vram.cbdcounter.ADD_WEED" />
-                <action android:name="com.d4vram.cbdcounter.ADD_POLEM" />
-                <action android:name="com.d4vram.cbdcounter.RESET_CBD" />
                 <action android:name="android.intent.action.DATE_CHANGED" />
                 <action android:name="android.intent.action.TIME_CHANGED" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
@@ -88,6 +84,10 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/cbd_widget_info" />
         </receiver>
+
+        <receiver
+            android:name=".CBDWidgetActionReceiver"
+            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
