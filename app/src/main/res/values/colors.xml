@@ -98,6 +98,14 @@
     <color name="m3_on_surface_variant">#49454F</color>
     <color name="m3_outline">#79747E</color>
 
+    <!-- Main screen polish — LIGHT -->
+    <color name="main_sheet_bg">#F1ECF4</color>
+    <color name="main_sheet_handle">#9C94A4</color>
+    <color name="main_top_icon_bg">#16000000</color>
+    <color name="main_stat_tile_bg">#B8FFFFFF</color>
+    <color name="main_action_tonal_bg">#EADDFF</color>
+    <color name="main_action_tonal_text">#21005D</color>
+
     <!-- ===== Dashboard cards — ME3 Expressive LIGHT ===== -->
     <!-- Hoy: azul cielo -->
     <color name="card_today_bg">#DBEAFE</color>

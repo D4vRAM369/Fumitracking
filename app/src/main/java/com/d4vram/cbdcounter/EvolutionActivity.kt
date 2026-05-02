@@ -25,7 +25,7 @@ class EvolutionActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_evolution)
 
-        window.statusBarColor = getColor(R.color.gradient_start)
+        EdgeToEdgeUtils.setStatusBarColor(this, R.color.gradient_start)
 
         val toolbar = findViewById<MaterialToolbar>(R.id.evolutionToolbar)
         toolbar.setNavigationOnClickListener { finish() }
@@ -46,7 +46,8 @@ class EvolutionActivity : AppCompatActivity() {
             loadData(rangeDays, offsetDays)
         }
 
-        rangeChipGroup.setOnCheckedChangeListener { _, checkedId ->
+        rangeChipGroup.setOnCheckedStateChangeListener { _, checkedIds ->
+            val checkedId = checkedIds.firstOrNull() ?: return@setOnCheckedStateChangeListener
             when (checkedId) {
                 R.id.chip7Days -> rangeDays = 7
                 R.id.chip14Days -> rangeDays = 14

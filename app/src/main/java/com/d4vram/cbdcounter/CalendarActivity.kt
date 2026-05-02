@@ -51,7 +51,7 @@ class CalendarActivity : AppCompatActivity(), NoteBottomSheet.Listener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stats)
 
-        window.statusBarColor = getColor(R.color.gradient_start)
+        EdgeToEdgeUtils.setStatusBarColor(this, R.color.gradient_start)
 
         toolbar = findViewById(R.id.statsToolbar)
         monthLabel = findViewById(R.id.monthLabel)

@@ -35,51 +35,6 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- ============ SECCIÓN: Tipo de Sustancia ============ -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/settings_substance_title"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:layout_marginBottom="8dp"/>
-
-            <com.google.android.material.button.MaterialButtonToggleGroup
-                android:id="@+id/substanceToggleGroup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:singleSelection="true"
-                app:selectionRequired="true"
-                app:checkedButton="@id/btnCbd">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCbd"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/cbd"
-                    android:textColor="@color/green_dark"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnThc"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/thc"
-                    android:textColor="@color/thc_primary_dark"/>
-
-            </com.google.android.material.button.MaterialButtonToggleGroup>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/m3_outline"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="24dp"/>
-
             <!-- ============ SECCIÓN: Backup ============ -->
             <TextView
                 android:layout_width="wrap_content"
@@ -268,6 +223,31 @@
                 android:textColor="@color/red_light"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="32dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="EXTRAS"
+                android:textAppearance="?attr/textAppearanceLabelSmall"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnGoals"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🎯 Metas Diarias"
+                android:layout_marginBottom="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnInsights"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📊 Insights Semanales"
+                android:layout_marginBottom="8dp"/>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

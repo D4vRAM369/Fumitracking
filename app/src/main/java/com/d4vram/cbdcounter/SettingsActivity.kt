@@ -70,33 +70,14 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        window.statusBarColor = getColor(R.color.gradient_start)
+        EdgeToEdgeUtils.setStatusBarColor(this, R.color.gradient_start)
 
         val toolbar = findViewById<MaterialToolbar>(R.id.settingsToolbar)
         toolbar.setNavigationOnClickListener { finish() }
 
-        setupSubstanceToggle()
         setupBackupSection()
         setupEmojiSection()
-    }
-
-    // ============================================================
-    // SECCIÓN: Tipo de Sustancia
-    // ============================================================
-    private fun setupSubstanceToggle() {
-        val substanceToggle = findViewById<MaterialButtonToggleGroup>(R.id.substanceToggleGroup)
-        val currentSubstance = Prefs.getSubstanceType(this)
-
-        if (currentSubstance == "THC") substanceToggle.check(R.id.btnThc)
-        else substanceToggle.check(R.id.btnCbd)
-
-        substanceToggle.addOnButtonCheckedListener { _, checkedId, isChecked ->
-            if (isChecked) {
-                val type = if (checkedId == R.id.btnThc) "THC" else "CBD"
-                Prefs.setSubstanceType(this, type)
-                Toast.makeText(this, "Modo $type activado", Toast.LENGTH_SHORT).show()
-            }
-        }
+        setupExtrasSection()
     }
 
     // ============================================================
@@ -401,6 +382,15 @@ class SettingsActivity : AppCompatActivity() {
             .setPositiveButton("Aceptar") { _, _ -> onEmojiSelected(emojis[selectedIndex]) }
             .setNegativeButton("Cancelar", null)
             .show()
+    }
+
+    private fun setupExtrasSection() {
+        findViewById<MaterialButton>(R.id.btnGoals).setOnClickListener {
+            startActivity(Intent(this, GoalsActivity::class.java))
+        }
+        findViewById<MaterialButton>(R.id.btnInsights).setOnClickListener {
+            startActivity(Intent(this, InsightsActivity::class.java))
+        }
     }
 
     // ============================================================

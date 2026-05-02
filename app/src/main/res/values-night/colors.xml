@@ -51,6 +51,14 @@
     <color name="m3_on_surface_variant">#CAC4D0</color>
     <color name="m3_outline">#938F99</color>
 
+    <!-- Main screen polish — DARK -->
+    <color name="main_sheet_bg">#211F26</color>
+    <color name="main_sheet_handle">#7D7785</color>
+    <color name="main_top_icon_bg">#22FFFFFF</color>
+    <color name="main_stat_tile_bg">#1FFFFFFF</color>
+    <color name="main_action_tonal_bg">#4A4458</color>
+    <color name="main_action_tonal_text">#EADDFF</color>
+
     <!-- ===== Dashboard cards — ME3 Expressive DARK ===== -->
     <!-- Hoy: azul marino profundo -->
     <color name="card_today_bg">#1E3A5F</color>

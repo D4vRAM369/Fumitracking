@@ -31,7 +31,7 @@ class DashboardActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
 
-        window.statusBarColor = getColor(R.color.gradient_start)
+        EdgeToEdgeUtils.setStatusBarColor(this, R.color.gradient_start)
 
         sharedPrefs = getSharedPreferences("CBDCounter", Context.MODE_PRIVATE)
 
@@ -53,7 +53,8 @@ class DashboardActivity : AppCompatActivity() {
         }
 
         val rangeChipGroup = findViewById<ChipGroup>(R.id.rangeChipGroup)
-        rangeChipGroup.setOnCheckedChangeListener { _, checkedId ->
+        rangeChipGroup.setOnCheckedStateChangeListener { _, checkedIds ->
+            val checkedId = checkedIds.firstOrNull() ?: return@setOnCheckedStateChangeListener
             val days = when (checkedId) {
                 R.id.chip7Days -> 7
                 R.id.chip14Days -> 14

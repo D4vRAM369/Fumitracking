@@ -29,5 +29,6 @@ local.properties
 markdown/
 
 .omx/
+.superpowers/
 output-metadata.json
 Thumbs.db

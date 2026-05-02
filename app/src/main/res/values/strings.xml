@@ -58,7 +58,6 @@
     <string name="pattern_best_day">Mejor día: %1$s (%2$d)</string>
 
     <!-- Toggle & THC Strings -->
-    <string name="settings_substance_title">Tipo de Sustancia</string>
     <string name="thc">THC</string>
     <string name="thc_added">THC agregado</string>
     <string name="thc_subtracted">THC restado</string>

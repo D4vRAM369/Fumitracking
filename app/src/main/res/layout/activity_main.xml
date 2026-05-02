@@ -21,7 +21,8 @@
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:paddingHorizontal="16dp"
-            android:paddingTop="48dp">
+            android:paddingTop="48dp"
+            android:paddingBottom="8dp">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -46,7 +47,7 @@
                     android:textColor="@color/m3_on_surface" />
             </LinearLayout>
 
-            <!-- Icones: fila horizontal arriba + vertical abajo -->
+            <!-- Iconos: dos filas compactas para reducir ruido visual -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -63,8 +64,10 @@
                         android:id="@+id/searchButton"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_top_icon_button"
                         android:contentDescription="@string/content_desc_search"
+                        android:padding="9dp"
                         android:src="@android:drawable/ic_menu_search"
                         android:tint="@color/m3_on_surface" />
 
@@ -72,8 +75,10 @@
                         android:id="@+id/themeToggleButton"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_top_icon_button"
                         android:contentDescription="@string/content_desc_theme_toggle"
+                        android:padding="9dp"
                         android:src="@drawable/ic_sun"
                         android:tint="@color/m3_on_surface" />
 
@@ -81,43 +86,53 @@
                         android:id="@+id/settingsButton"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:background="@drawable/bg_top_icon_button"
                         android:contentDescription="@string/content_desc_settings"
+                        android:padding="9dp"
                         android:src="@android:drawable/ic_menu_manage"
                         android:tint="@color/m3_on_surface" />
 
                 </LinearLayout>
 
-                <!-- Fila 2+ vertical: calendar · export · import -->
-                <ImageButton
-                    android:id="@+id/calendarButton"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="end"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/content_desc_calendar"
-                    android:src="@drawable/ic_calendar"
-                    android:tint="@color/m3_on_surface" />
+                <!-- Fila 2: calendar · export · import -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="horizontal">
 
-                <ImageButton
-                    android:id="@+id/exportCsvIconButton"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="end"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/export_csv"
-                    android:src="@drawable/ic_csv_export"
-                    android:tint="@color/m3_on_surface" />
+                    <ImageButton
+                        android:id="@+id/calendarButton"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_top_icon_button"
+                        android:contentDescription="@string/content_desc_calendar"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_calendar"
+                        android:tint="@color/m3_on_surface" />
 
-                <ImageButton
-                    android:id="@+id/importCsvIconButton"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="end"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/import_csv"
-                    android:src="@drawable/ic_csv_import"
-                    android:tint="@color/m3_on_surface" />
+                    <ImageButton
+                        android:id="@+id/exportCsvIconButton"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_top_icon_button"
+                        android:contentDescription="@string/export_csv"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_csv_export"
+                        android:tint="@color/m3_on_surface" />
+
+                    <ImageButton
+                        android:id="@+id/importCsvIconButton"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_top_icon_button"
+                        android:contentDescription="@string/import_csv"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_csv_import"
+                        android:tint="@color/m3_on_surface" />
+                </LinearLayout>
 
             </LinearLayout>
         </LinearLayout>
@@ -213,7 +228,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="@color/m3_surface_variant"
+        android:background="@drawable/bg_main_sheet"
+        android:elevation="8dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         app:behavior_peekHeight="260dp"
         app:behavior_hideable="false">
@@ -225,7 +241,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="12dp"
-            android:background="@color/m3_outline" />
+            android:background="@drawable/bg_sheet_handle" />
 
         <!-- FAB extendido CBD -->
         <com.google.android.material.button.MaterialButton
@@ -251,7 +267,8 @@
             android:layout_marginBottom="4dp"
             android:text="@string/stats_chip_label"
             android:textSize="14sp"
-            android:textAllCaps="false" />
+            android:textAllCaps="false"
+            app:chipBackgroundColor="@color/main_stat_tile_bg" />
 
         <!-- Fila stats -->
         <LinearLayout
@@ -268,7 +285,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_main_stat_tile"
                 android:gravity="center"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="9dp"
                 android:text="@string/avg_placeholder"
                 android:textSize="12sp"
                 android:textColor="@color/m3_on_surface_variant" />
@@ -278,7 +299,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_marginHorizontal="3dp"
+                android:background="@drawable/bg_main_stat_tile"
                 android:gravity="center"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="9dp"
                 android:text="@string/total_placeholder"
                 android:textSize="12sp"
                 android:textColor="@color/m3_on_surface_variant" />
@@ -288,7 +313,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_main_stat_tile"
                 android:gravity="center"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="9dp"
                 android:text="@string/streak_placeholder"
                 android:textSize="12sp"
                 android:textColor="@color/m3_on_surface_variant" />
@@ -304,16 +333,20 @@
             android:paddingTop="8dp"
             android:gravity="center_vertical">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/subtractButton"
                 style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:text="@string/subtract_button_label"
-                android:layout_marginEnd="8dp" />
+                android:textAllCaps="false"
+                android:layout_marginEnd="8dp"
+                app:backgroundTint="@color/main_action_tonal_bg"
+                app:cornerRadius="18dp"
+                app:iconPadding="0dp" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/addButton"
                 style="@style/Widget.Material3.Button"
                 android:layout_width="0dp"
@@ -322,16 +355,19 @@
                 android:text="@string/add_thc_label"
                 android:textAllCaps="false"
                 android:layout_marginHorizontal="8dp"
-                app:backgroundTint="@color/m3_tertiary" />
+                app:backgroundTint="@color/m3_tertiary"
+                app:cornerRadius="18dp" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/resetButton"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:text="@string/reset_button_label"
-                android:layout_marginStart="8dp" />
+                android:textAllCaps="false"
+                android:layout_marginStart="8dp"
+                app:cornerRadius="18dp" />
         </LinearLayout>
 
         <!-- Tabs historial -->
@@ -340,7 +376,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:background="@color/m3_surface_variant"
+            android:background="@color/main_sheet_bg"
             app:tabMode="fixed"
             app:tabGravity="fill" />
 

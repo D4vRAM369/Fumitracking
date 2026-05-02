@@ -4,6 +4,8 @@ import android.os.Build
 import android.view.View
 import android.view.WindowInsetsController
 import androidx.appcompat.app.AppCompatActivity
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
@@ -11,6 +13,11 @@ import androidx.core.view.WindowInsetsCompat
  * Utilidades para manejar edge-to-edge de forma consistente en toda la app
  */
 object EdgeToEdgeUtils {
+
+    @Suppress("DEPRECATION")
+    fun setStatusBarColor(activity: AppCompatActivity, @ColorRes colorRes: Int) {
+        activity.window.statusBarColor = ContextCompat.getColor(activity, colorRes)
+    }
 
     /**
      * Habilita edge-to-edge en una Activity.

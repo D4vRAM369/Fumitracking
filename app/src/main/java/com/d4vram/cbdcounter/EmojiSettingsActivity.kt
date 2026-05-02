@@ -59,7 +59,7 @@ class EmojiSettingsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_emoji_settings)
 
         // Configurar color de la barra de estado
-        window.statusBarColor = ContextCompat.getColor(this, R.color.gradient_start)
+        EdgeToEdgeUtils.setStatusBarColor(this, R.color.gradient_start)
 
         // Configurar toolbar
         val toolbar = findViewById<MaterialToolbar>(R.id.settingsToolbar)
@@ -76,24 +76,6 @@ class EmojiSettingsActivity : AppCompatActivity() {
             saveCustomEmoji(range.count, newEmoji)
         }
         recyclerView.adapter = adapter
-
-        // Configurar Toggle Sintonía (CBD/THC)
-        val substanceToggle = findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.substanceToggleGroup)
-        val currentSubstance = Prefs.getSubstanceType(this)
-        
-        if (currentSubstance == "THC") {
-            substanceToggle.check(R.id.btnThc)
-        } else {
-            substanceToggle.check(R.id.btnCbd)
-        }
-
-        substanceToggle.addOnButtonCheckedListener { _, checkedId, isChecked ->
-            if (isChecked) {
-                val type = if (checkedId == R.id.btnThc) "THC" else "CBD"
-                Prefs.setSubstanceType(this, type)
-                // TODO: Apply Color Theme changes if necessary immediately or show toast
-            }
-        }
 
         // Configurar botón de reset
         resetButton = findViewById(R.id.resetButton)
