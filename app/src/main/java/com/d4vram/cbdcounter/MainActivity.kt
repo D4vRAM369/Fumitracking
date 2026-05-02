@@ -334,20 +334,7 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
 
     private fun loadAllHistoryData() {
         allHistoryData.clear()
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-
-        val allDates = Prefs.getAllDatesWithData(this)
-        allDates.forEach { dateString ->
-            try {
-                val date = dateFormat.parse(dateString)
-                if (date != null) {
-                    val cbd = Prefs.getCbdCount(this, dateString)
-                    val thc = Prefs.getThcCount(this, dateString)
-                    allHistoryData.add(HistoryItem(dateString, cbd, thc, date))
-                }
-            } catch (_: Exception) {}
-        }
-        allHistoryData.sortByDescending { it.dateObject }
+        allHistoryData.addAll(HistoryRepository.loadAll(this))
     }
 
     private fun updateHistoryView() {
