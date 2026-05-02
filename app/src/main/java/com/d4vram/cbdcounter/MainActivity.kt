@@ -550,7 +550,7 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
             dialogView.findViewById<View>(R.id.chip_confirm).setOnClickListener {
                 if (isThc) thcCount-- else cbdCount--
                 updateDisplay()
-                removeLastEntryFromTodayNote()  // Borrar último timestamp
+                IntakeController.removeLastEntry(this, getCurrentDateKey())  // Borrar último timestamp
                 saveData()
                 animateCounter(0.9f)
                 val msg = if (isThc) getString(R.string.thc_subtracted) else getString(R.string.cbd_subtracted)
@@ -775,23 +775,20 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
 
     /** Registra una toma que siempre va al contador THC (para infusiones) */
     private fun registerThcIntake(entry: String, feedbackMessage: String) {
-        thcCount++
+        val snapshot = IntakeController.registerThc(this, getCurrentDateKey(), entry)
+        cbdCount = snapshot.cbdCount
+        thcCount = snapshot.thcCount
         updateDisplay()
-        appendEntryToTodayNote(entry)
         saveData()
         animateCounter(1.1f)
         showFeedback("$feedbackMessage (THC)", false)
     }
 
     private fun registerIntake(entry: String, feedbackMessage: String) {
-        val isThc = Prefs.getSubstanceType(this) == "THC"
-        if (isThc) {
-            thcCount++
-        } else {
-            cbdCount++
-        }
+        val snapshot = IntakeController.registerActive(this, getCurrentDateKey(), entry)
+        cbdCount = snapshot.cbdCount
+        thcCount = snapshot.thcCount
         updateDisplay()
-        appendEntryToTodayNote(entry)
         saveData()
         animateCounter(1.1f)
         showFeedback(feedbackMessage, false)
@@ -826,48 +823,6 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
 
             dialog.show()
         }
-    }
-
-    private fun appendEntryToTodayNote(entry: String) {
-        val today = getCurrentDateKey()
-        val currentNote = Prefs.getNote(this, today)
-
-        val updatedNote = if (currentNote.isNullOrBlank()) {
-            entry
-        } else {
-            buildString {
-                append(currentNote)
-                if (!currentNote.endsWith("\n")) append("\n")
-                append(entry)
-            }
-        }
-
-        Prefs.setNote(this, today, updatedNote)
-    }
-
-    private fun removeLastEntryFromTodayNote() {
-        val today = getCurrentDateKey()
-        val currentNote = Prefs.getNote(this, today)
-
-        // Si no hay nota o está vacía, no hay nada que borrar
-        if (currentNote.isNullOrBlank()) return
-
-        // Dividir la nota en líneas
-        val lines = currentNote.split("\n").toMutableList()
-
-        // Eliminar la última línea
-        if (lines.isNotEmpty()) {
-            lines.removeAt(lines.lastIndex)
-        }
-
-        // Si quedan líneas, unirlas de nuevo; si no, guardar null
-        val updatedNote = if (lines.isNotEmpty()) {
-            lines.joinToString("\n")
-        } else {
-            null
-        }
-
-        Prefs.setNote(this, today, updatedNote)
     }
 
     private fun animateEmoji() {

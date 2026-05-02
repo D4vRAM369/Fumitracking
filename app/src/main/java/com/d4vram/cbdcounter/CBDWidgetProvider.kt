@@ -239,47 +239,27 @@ class CBDWidgetActionReceiver : BroadcastReceiver() {
 private object WidgetActionHandler {
     fun addStandardCBD(context: Context) {
         val today = currentDateKey()
-        Prefs.incrementActiveCount(context, today)
         val isThc = Prefs.getSubstanceType(context) == "THC"
         val entry = if (isThc) "🟢 ${currentTimestamp()}" else "🔹 ${currentTimestamp()}"
-        appendNote(context, entry)
+        IntakeController.registerActive(context, today, entry)
     }
 
     fun addWeed(context: Context) {
         // Weed siempre suma a THC, independiente del modo activo
         val today = currentDateKey()
-        Prefs.setThcCount(context, today, Prefs.getThcCount(context, today) + 1)
         val entry = "🌿 ${currentTimestamp()} (aliñado con weed)"
-        appendNote(context, entry)
+        IntakeController.registerThc(context, today, entry)
     }
 
     fun addPolem(context: Context) {
         // Polen siempre suma a THC, independiente del modo activo
         val today = currentDateKey()
-        Prefs.setThcCount(context, today, Prefs.getThcCount(context, today) + 1)
         val entry = "🍫 ${currentTimestamp()} (aliñado con polen)"
-        appendNote(context, entry)
+        IntakeController.registerThc(context, today, entry)
     }
 
     fun resetActiveCounter(context: Context) {
-        val today = currentDateKey()
-        val isThc = Prefs.getSubstanceType(context) == "THC"
-        if (isThc) {
-            Prefs.setThcCount(context, today, 0)
-        } else {
-            Prefs.setCbdCount(context, today, 0)
-        }
-    }
-
-    private fun appendNote(context: Context, entry: String) {
-        val today = currentDateKey()
-        val currentNote = Prefs.getNote(context, today)
-        val updatedNote = if (currentNote.isNullOrBlank()) {
-            entry
-        } else {
-            "$currentNote\n$entry"
-        }
-        Prefs.setNote(context, today, updatedNote)
+        IntakeController.resetActive(context, currentDateKey())
     }
 
     private fun currentDateKey(): String =
