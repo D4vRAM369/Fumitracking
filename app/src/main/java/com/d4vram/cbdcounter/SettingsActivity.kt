@@ -315,19 +315,17 @@ class SettingsActivity : AppCompatActivity() {
             runCatching { dateFormat.parse(ds) }.getOrNull()?.let { ds to it }
         }.sortedBy { it.second }
 
-        val sb = StringBuilder("date,count_cbd,count_thc,note\n")
+        val sb = StringBuilder("${CsvCodec.HEADER}\n")
         sortedDates.forEach { (ds, _) ->
-            sb.append(ds).append(',')
-                .append(Prefs.getCbdCount(this, ds)).append(',')
-                .append(Prefs.getThcCount(this, ds)).append(',')
-                .append(escapeCsvField(Prefs.getNote(this, ds) ?: "")).append('\n')
+            CsvCodec.appendRow(
+                sb,
+                ds,
+                Prefs.getCbdCount(this, ds),
+                Prefs.getThcCount(this, ds),
+                Prefs.getNote(this, ds) ?: ""
+            )
         }
         return sb.toString()
-    }
-
-    private fun escapeCsvField(value: String): String {
-        if (value.isEmpty()) return ""
-        return value.replace("\\", "\\\\").replace("\n", "\\n").replace(",", "\\,")
     }
 
     // ============================================================

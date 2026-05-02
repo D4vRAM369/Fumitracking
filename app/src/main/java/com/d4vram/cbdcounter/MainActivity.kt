@@ -666,20 +666,13 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
             }
         }.sortedBy { it.second }
 
-        val builder = StringBuilder("date,count_cbd,count_thc,note\n")
+        val builder = StringBuilder("${CsvCodec.HEADER}\n")
         sortedDates.forEach { (dateString, _) ->
             val cbdCount = Prefs.getCbdCount(this, dateString)
             val thcCount = Prefs.getThcCount(this, dateString)
             val note = Prefs.getNote(this, dateString) ?: ""
 
-            builder.append(dateString)
-                .append(',')
-                .append(cbdCount)
-                .append(',')
-                .append(thcCount)
-                .append(',')
-                .append(escapeCsvField(note))
-                .append('\n')
+            CsvCodec.appendRow(builder, dateString, cbdCount, thcCount, note)
         }
         return builder.toString()
     }
@@ -688,8 +681,9 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
         val result = runCatching {
             contentResolver.openInputStream(uri)?.use { stream ->
                 BufferedReader(InputStreamReader(stream, Charsets.UTF_8)).use { reader ->
-                    val lines = reader.readLines()
-                    if (lines.isEmpty()) throw IllegalArgumentException("Archivo vacío")
+                    val content = reader.readText()
+                    val records = CsvCodec.parse(content)
+                    if (records.isEmpty()) throw IllegalArgumentException("Archivo vacío")
 
                     val editor = sharedPrefs.edit()
                     // Limpiar datos existentes
@@ -698,12 +692,19 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
                     }.forEach { key -> editor.remove(key) }
 
                     // Detectar formato por cabecera
-                    val header = lines.first().lowercase()
+                    val header = records.first().joinToString(",").lowercase()
                     val isNewFormat = header.contains("count_cbd")
+                    val dataRows = if (isNewFormat) {
+                        records.drop(1)
+                    } else {
+                        content.lineSequence()
+                            .drop(1)
+                            .filter { it.isNotBlank() }
+                            .map { CsvCodec.parseLegacyLine(it) }
+                            .toList()
+                    }
 
-                    lines.drop(1).forEach { line ->
-                        if (line.isBlank()) return@forEach
-                        val columns = splitCsvLine(line)
+                    dataRows.forEach { columns ->
                         if (columns.size < 2) return@forEach
 
                         val date = columns[0]
@@ -716,14 +717,14 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
                             editor.putInt("${Prefs.KEY_COUNT_THC_PREFIX}$date", thcCount)
 
                             val rawNote = columns.getOrNull(3) ?: ""
-                            val note = unescapeCsvField(rawNote)
+                            val note = rawNote
                             if (note.isNotEmpty()) {
                                 editor.putString("${Prefs.KEY_NOTE_PREFIX}$date", note)
                             }
                         } else {
                             // Formato legacy: date,count,note,substance
                             val count = columns[1].toIntOrNull() ?: return@forEach
-                            val substance = if (columns.size >= 4) unescapeCsvField(columns[3]) else "CBD"
+                            val substance = if (columns.size >= 4) columns[3] else "CBD"
 
                             // Importar al contador correspondiente
                             if (substance == "THC") {
@@ -733,7 +734,7 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
                             }
 
                             val rawNote = if (columns.size >= 3) columns[2] else ""
-                            val note = unescapeCsvField(rawNote)
+                            val note = rawNote
                             if (note.isNotEmpty()) {
                                 editor.putString("${Prefs.KEY_NOTE_PREFIX}$date", note)
                             }
@@ -756,78 +757,6 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
         }.onFailure { e ->
             showFeedback("Error al importar CSV: ${e.message}", true)
         }
-    }
-
-    private fun splitCsvLine(line: String): List<String> {
-        val fields = mutableListOf<String>()
-        val current = StringBuilder()
-        var escape = false
-        line.forEach { char ->
-            when {
-                escape -> {
-                    current.append(char)
-                    escape = false
-                }
-                char == '\\' -> {
-                    current.append(char)
-                    escape = true
-                }
-                char == ',' -> {
-                    fields.add(current.toString())
-                    current.setLength(0)
-                }
-                else -> current.append(char)
-            }
-        }
-        fields.add(current.toString())
-        return fields
-    }
-
-    private fun escapeCsvField(value: String): String {
-        if (value.isEmpty()) return ""
-        
-        // RFC 4180: Si el campo contiene comas, saltos de línea o comillas,
-        // debe ir entre comillas dobles. Las comillas dobles se duplican.
-        val needsQuotes = value.contains(',') || value.contains('\n') || value.contains('"') || value.contains('\r')
-        
-        return if (needsQuotes) {
-            // Duplicar comillas dobles y envolver todo en comillas
-            "\"${value.replace("\"", "\"\"")}\""
-        } else {
-            value
-        }
-    }
-
-    private fun unescapeCsvField(value: String): String {
-        if (value.isEmpty()) return ""
-        
-        // RFC 4180: Si el campo está entre comillas, removerlas y desduplicar comillas internas
-        if (value.startsWith("\"") && value.endsWith("\"") && value.length >= 2) {
-            return value.substring(1, value.length - 1).replace("\"\"", "\"")
-        }
-        
-        // Backward compatibility: Manejar formato antiguo con backslash
-        val builder = StringBuilder()
-        var escape = false
-        value.forEach { char ->
-            if (escape) {
-                builder.append(
-                    when (char) {
-                        'n' -> '\n'
-                        '\\' -> '\\'
-                        ',' -> ','
-                        else -> char
-                    }
-                )
-                escape = false
-            } else if (char == '\\') {
-                escape = true
-            } else {
-                builder.append(char)
-            }
-        }
-        if (escape) builder.append('\\')
-        return builder.toString()
     }
 
     private fun registerStandardIntake() {

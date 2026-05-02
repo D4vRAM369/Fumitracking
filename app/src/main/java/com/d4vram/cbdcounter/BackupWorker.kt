@@ -46,28 +46,20 @@ class BackupWorker(context: Context, params: WorkerParameters) :
 
     private fun buildCsvContent(): String {
         val allDates = Prefs.getAllDatesWithData(applicationContext)
-        if (allDates.isEmpty()) return "date,count_cbd,count_thc,note\n"
+        if (allDates.isEmpty()) return "${CsvCodec.HEADER}\n"
 
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val sorted = allDates.mapNotNull { ds ->
             runCatching { dateFormat.parse(ds) }.getOrNull()?.let { ds to it }
         }.sortedBy { it.second }
 
-        val sb = StringBuilder("date,count_cbd,count_thc,note\n")
+        val sb = StringBuilder("${CsvCodec.HEADER}\n")
         sorted.forEach { (ds, _) ->
             val cbd  = Prefs.getCbdCount(applicationContext, ds)
             val thc  = Prefs.getThcCount(applicationContext, ds)
             val note = Prefs.getNote(applicationContext, ds) ?: ""
-            sb.append(ds).append(',')
-                .append(cbd).append(',')
-                .append(thc).append(',')
-                .append(escapeCsvField(note)).append('\n')
+            CsvCodec.appendRow(sb, ds, cbd, thc, note)
         }
         return sb.toString()
-    }
-
-    private fun escapeCsvField(value: String): String {
-        if (value.isEmpty()) return ""
-        return value.replace("\\", "\\\\").replace("\n", "\\n").replace(",", "\\,")
     }
 }
