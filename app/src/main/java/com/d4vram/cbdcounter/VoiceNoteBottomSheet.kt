@@ -15,7 +15,6 @@ import androidx.core.content.ContextCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
-import java.io.File
 
 class VoiceNoteBottomSheet : BottomSheetDialogFragment() {
 
@@ -50,9 +49,9 @@ class VoiceNoteBottomSheet : BottomSheetDialogFragment() {
         btnPlayRef = btnPlay
         btnDeleteRef = btnDelete
 
-        val audioPath = Prefs.getVoiceNotePath(requireContext(), dateArg)
+        val audioPath = VoiceNoteRepository.outputFile(requireContext(), dateArg).absolutePath
 
-        if (File(audioPath).exists()) {
+        if (VoiceNoteRepository.existingFile(requireContext(), dateArg) != null) {
             btnPlay.visibility = View.VISIBLE
             btnDelete.visibility = View.VISIBLE
         }
@@ -62,10 +61,14 @@ class VoiceNoteBottomSheet : BottomSheetDialogFragment() {
             else stopRecording(btnRecord, waveform, btnPlay, btnDelete)
         }
 
-        btnPlay.setOnClickListener { playAudio(audioPath) }
+        btnPlay.setOnClickListener {
+            val file = VoiceNoteRepository.existingFile(requireContext(), dateArg)
+                ?: VoiceNoteRepository.outputFile(requireContext(), dateArg)
+            playAudio(file.absolutePath)
+        }
 
         btnDelete.setOnClickListener {
-            File(audioPath).delete()
+            VoiceNoteRepository.deleteAllForDate(requireContext(), dateArg)
             (activity as? Listener)?.onVoiceNoteChanged(dateArg)
             dismiss()
         }
@@ -110,7 +113,7 @@ class VoiceNoteBottomSheet : BottomSheetDialogFragment() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_AUDIO_PERMISSION) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                val audioPath = Prefs.getVoiceNotePath(requireContext(), dateArg)
+                val audioPath = VoiceNoteRepository.outputFile(requireContext(), dateArg).absolutePath
                 val btn = btnRecordRef ?: return
                 val wave = waveRef ?: return
                 startRecording(audioPath, btn, wave)

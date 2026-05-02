@@ -66,12 +66,9 @@ object BackupManager {
                 // Agregar JSON
                 addToZip(zos, jsonFile, JSON_FILE_NAME)
 
-                // Agregar Audios
-                val audioDir = File(context.filesDir, "audios")
-                if (audioDir.exists() && audioDir.isDirectory) {
-                    audioDir.listFiles()?.forEach { audioFile ->
-                        addToZip(zos, audioFile, "audios/${audioFile.name}")
-                    }
+                // Agregar notas de voz canónicas y archivos legacy.
+                VoiceNoteRepository.exportEntries(context).forEach { (audioFile, entryName) ->
+                    addToZip(zos, audioFile, entryName)
                 }
             }
 
@@ -155,14 +152,8 @@ object BackupManager {
             }
 
             // 5. Restaurar Audios
-            val audiosDir = File(tempDir, "audios")
-            if (audiosDir.exists() && audiosDir.isDirectory) {
-                val targetDir = File(context.filesDir, "audios")
-                targetDir.mkdirs()
-                audiosDir.listFiles()?.forEach { audioFile ->
-                    audioFile.copyTo(File(targetDir, audioFile.name), overwrite = true)
-                }
-            }
+            restoreAudioDirectory(tempDir, context, "audios")
+            restoreAudioDirectory(tempDir, context, "voice_notes")
 
             return true
 
@@ -172,5 +163,21 @@ object BackupManager {
         } finally {
             tempDir.deleteRecursively()
         }
+    }
+
+    private fun restoreAudioDirectory(tempDir: File, context: Context, name: String) {
+        val sourceDir = File(tempDir, name)
+        if (!sourceDir.exists() || !sourceDir.isDirectory) return
+
+        val targetDir = File(context.filesDir, name)
+        targetDir.mkdirs()
+        sourceDir.walkTopDown()
+            .filter { it.isFile }
+            .forEach { audioFile ->
+                val relativePath = audioFile.relativeTo(sourceDir)
+                val targetFile = File(targetDir, relativePath.path)
+                targetFile.parentFile?.mkdirs()
+                audioFile.copyTo(targetFile, overwrite = true)
+            }
     }
 }

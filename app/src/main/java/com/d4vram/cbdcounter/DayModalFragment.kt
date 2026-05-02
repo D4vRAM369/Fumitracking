@@ -112,8 +112,8 @@ class DayModalFragment : DialogFragment() {
             noteEditText.setText(Prefs.getNote(requireContext(), d) ?: "")
 
             // Check if audio exists
-            audioFile = getAudioFile(d)
-            if (audioFile?.exists() == true) {
+            audioFile = VoiceNoteRepository.existingFile(requireContext(), d)
+            if (audioFile != null) {
                 audioStatus.text = "Audio grabado disponible"
                 seekBarContainer.visibility = View.VISIBLE
                 audioControlsLayout.visibility = View.VISIBLE
@@ -155,7 +155,7 @@ class DayModalFragment : DialogFragment() {
         }
 
         deleteAudioButton.setOnClickListener {
-            audioFile?.delete()
+            date?.let { d -> VoiceNoteRepository.deleteAllForDate(requireContext(), d) }
             audioFile = null
             mediaPlayer?.release()
             mediaPlayer = null
@@ -185,12 +185,6 @@ class DayModalFragment : DialogFragment() {
             .create()
     }
 
-    private fun getAudioFile(date: String): File {
-        val dir = File(requireContext().filesDir, "audios")
-        if (!dir.exists()) dir.mkdirs()
-        return File(dir, "audio_$date.3gp")
-    }
-
     private fun startRecording() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_RECORD_AUDIO_PERMISSION)
@@ -199,14 +193,12 @@ class DayModalFragment : DialogFragment() {
 
         date?.let { d ->
             try {
-                val audioFile = getAudioFile(d)
-                if (!audioFile.parentFile?.exists()!!) {
-                    audioFile.parentFile?.mkdirs()
-                }
+                val audioFile = VoiceNoteRepository.outputFile(requireContext(), d)
+                this.audioFile = audioFile
                 mediaRecorder = android.media.MediaRecorder(requireContext()).apply {
                     setAudioSource(android.media.MediaRecorder.AudioSource.MIC)
-                    setOutputFormat(android.media.MediaRecorder.OutputFormat.THREE_GPP)
-                    setAudioEncoder(android.media.MediaRecorder.AudioEncoder.AMR_NB)
+                    setOutputFormat(android.media.MediaRecorder.OutputFormat.MPEG_4)
+                    setAudioEncoder(android.media.MediaRecorder.AudioEncoder.AAC)
                     setOutputFile(audioFile.absolutePath)
                     prepare()
                     start()

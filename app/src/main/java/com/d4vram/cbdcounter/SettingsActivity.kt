@@ -244,8 +244,8 @@ class SettingsActivity : AppCompatActivity() {
     // Exportar ZIP de audios — mismo patrón SAF/fallback
     // ============================================================
     private fun exportZipToSaf() {
-        val audioDir = File(filesDir, "audios")
-        if (!audioDir.exists() || audioDir.listFiles()?.isEmpty() == true) {
+        val audioEntries = VoiceNoteRepository.exportEntries(this)
+        if (audioEntries.isEmpty()) {
             Toast.makeText(this, "No hay audios para exportar", Toast.LENGTH_SHORT).show()
             return
         }
@@ -259,9 +259,9 @@ class SettingsActivity : AppCompatActivity() {
                 if (zipDoc != null) {
                     contentResolver.openOutputStream(zipDoc.uri)?.use { os ->
                         ZipOutputStream(os).use { zos ->
-                            audioDir.listFiles()?.forEach { f ->
+                            audioEntries.forEach { (f, entryName) ->
                                 FileInputStream(f).use { fis ->
-                                    zos.putNextEntry(ZipEntry(f.name))
+                                    zos.putNextEntry(ZipEntry(entryName))
                                     fis.copyTo(zos)
                                     zos.closeEntry()
                                 }
@@ -278,12 +278,12 @@ class SettingsActivity : AppCompatActivity() {
         } else {
             // Fallback — carpeta exports/ (declarada en file_paths.xml)
             val exportDir = File(cacheDir, "exports").apply { if (!exists()) mkdirs() }
-            val zipFile   = File(exportDir, "audios_export.zip")
+            val zipFile = File(exportDir, "audios_export.zip")
             try {
                 ZipOutputStream(FileOutputStream(zipFile)).use { zos ->
-                    audioDir.listFiles()?.forEach { f ->
+                    audioEntries.forEach { (f, entryName) ->
                         FileInputStream(f).use { fis ->
-                            zos.putNextEntry(ZipEntry(f.name))
+                            zos.putNextEntry(ZipEntry(entryName))
                             fis.copyTo(zos)
                             zos.closeEntry()
                         }

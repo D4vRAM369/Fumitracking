@@ -37,8 +37,7 @@ object Prefs {
         prefs(ctx).contains("${KEY_NOTE_PREFIX}$date")
 
     fun hasAudio(ctx: Context, date: String): Boolean {
-        val audioFile = File(ctx.filesDir, "audios/audio_$date.mp3")
-        return audioFile.exists()
+        return VoiceNoteRepository.hasVoiceNote(ctx, date)
     }
 
     // ---- Sustancia (CBD vs THC) - Modo activo ----
@@ -130,16 +129,11 @@ object Prefs {
 
     // ---- Helpers para NOTAS DE VOZ ----
     fun getVoiceNotePath(context: Context, date: String): String {
-        val dir = java.io.File(context.filesDir, "voice_notes").also { it.mkdirs() }
-        // Las fechas usan formato "dd/MM/yyyy" — las barras "/" se interpretarían como
-        // separadores de directorio en File(), creando subdirectorios inexistentes.
-        // Se sanitizan a "dd-MM-yyyy" para que quede como un nombre de archivo plano.
-        val safeName = date.replace("/", "-")
-        return java.io.File(dir, "$safeName.m4a").absolutePath
+        return VoiceNoteRepository.outputFile(context, date).absolutePath
     }
 
     fun hasVoiceNote(context: Context, date: String): Boolean {
-        return java.io.File(getVoiceNotePath(context, date)).exists()
+        return VoiceNoteRepository.hasVoiceNote(context, date)
     }
 
     /** Obtiene todas las fechas que tienen datos (para historial) */
