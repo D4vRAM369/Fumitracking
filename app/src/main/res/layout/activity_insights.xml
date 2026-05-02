@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="?attr/colorSurface">
+    android:background="?attr/colorSurface"
+    android:fitsSystemWindows="true">
 
     <!-- Selector de semana -->
     <LinearLayout
@@ -46,12 +47,14 @@
     <LinearLayout
         android:id="@+id/llBarsContainer"
         android:layout_width="match_parent"
-        android:layout_height="160dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="horizontal"
         android:gravity="bottom"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:paddingBottom="8dp"/>
+        android:paddingBottom="8dp"
+        android:paddingTop="24dp"/>
 
     <!-- Labels días -->
     <LinearLayout
