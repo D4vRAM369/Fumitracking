@@ -136,8 +136,8 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
 
     enum class ViewMode { WEEK, MONTH, ALL }
     private enum class InfusionType(
-        @StringRes val labelRes: Int,
-        @StringRes val feedbackRes: Int,
+        @param:StringRes val labelRes: Int,
+        @param:StringRes val feedbackRes: Int,
         val icon: String
     ) {
         WEED(R.string.weed_option, R.string.cbd_infused_added_weed, "🌿"),
@@ -153,22 +153,7 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Hacer que el contenido se dibuje detrás de la barra de estado
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.setDecorFitsSystemWindows(false)
-            // Iconos de barra de estado: oscuros en light mode, claros en dark mode
-            val isDark = isDarkModeEnabled()
-            window.insetsController?.setSystemBarsAppearance(
-                if (isDark) 0 else WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
-                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
-            )
-        } else {
-            @Suppress("DEPRECATION")
-            window.decorView.systemUiVisibility = (
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            )
-        }
+        EdgeToEdgeUtils.enableEdgeToEdge(this, lightStatusBar = !isDarkModeEnabled())
 
         runCatching {
             // initSharedPreferences() -> Ya llamado arriba

@@ -16,6 +16,7 @@ object EdgeToEdgeUtils {
      * Habilita edge-to-edge en una Activity.
      * Usa esto cuando el layout ya tiene fitsSystemWindows="true" en el AppBarLayout/Toolbar.
      */
+    @Suppress("DEPRECATION")
     fun enableEdgeToEdge(activity: AppCompatActivity, lightStatusBar: Boolean = false) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             activity.window.setDecorFitsSystemWindows(false)
