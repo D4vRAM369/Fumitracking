@@ -29,6 +29,9 @@ local.properties
 markdown/
 
 .omx/
+.omc/
+.codex
 .superpowers/
+gradle/gradle-daemon-jvm.properties
 output-metadata.json
 Thumbs.db
