@@ -9,6 +9,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
 import java.text.SimpleDateFormat
 import java.util.*
@@ -25,6 +27,13 @@ class InsightsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_insights)
         supportActionBar?.title = "Insights"
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        // Edge-to-edge: aplicar insets al root para respetar status bar y navigation bar
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         findViewById<MaterialButton>(R.id.btnPrevWeek).setOnClickListener {
             weekOffset--
