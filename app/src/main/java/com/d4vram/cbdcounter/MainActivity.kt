@@ -83,6 +83,7 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
     private lateinit var sharedPrefs: SharedPreferences
     private var cbdCount = 0
     private var thcCount = 0
+    private var loadedDateKey = ""  // día cargado en pantalla; detecta cambio de medianoche
     private val currentCount: Int get() = cbdCount + thcCount  // Total para emoji y compatibilidad
     private val allHistoryData = ArrayList<HistoryItem>()
     private val displayedHistoryData = ArrayList<HistoryItem>()
@@ -313,8 +314,31 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
 
     private fun loadTodayData() {
         val today = getCurrentDateKey()
+        loadedDateKey = today
         cbdCount = Prefs.getCbdCount(this, today)
         thcCount = Prefs.getThcCount(this, today)
+    }
+
+    /**
+     * Si el día cambió desde la última carga (típicamente al pasar medianoche con la app
+     * en segundo plano), recarga todo y empuja el widget. Disparador fiable de reloj real:
+     * se llama cada vez que la app recupera el foco, no depende de Handler/uptime.
+     */
+    private fun reloadIfDateChanged() {
+        if (getCurrentDateKey() == loadedDateKey) return
+        loadTodayData()
+        updateDisplay(animate = false)
+        loadAllHistoryData()
+        updateHistoryView()
+        updateStats()
+        historyAdapter.refresh()
+        CBDWidgetProvider.updateAllWidgets(this)
+        scheduleMidnightReload()
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) reloadIfDateChanged()
     }
 
     private fun loadAllHistoryData() {
@@ -519,52 +543,48 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
             startActivity(Intent(this, SettingsActivity::class.java))
         }
         subtractButton.setOnClickListener {
-        val isThc = Prefs.getSubstanceType(this) == "THC"
-        val activeCount = if (isThc) thcCount else cbdCount
-
-        if (activeCount > 0) {
-            // Inflar layout personalizado
-            val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_confirm_delete, null)
-
-            // Crear el diálogo
-            val dialog = MaterialAlertDialogBuilder(this)
-                .setView(dialogView)
-                .setCancelable(true)
-                .create()
-
-            // Configurar chips
-            dialogView.findViewById<View>(R.id.chip_confirm).setOnClickListener {
-                if (isThc) thcCount-- else cbdCount--
-                updateDisplay()
-                IntakeController.removeLastEntry(this, getCurrentDateKey())  // Borrar último timestamp
-                saveData()
-                animateCounter(0.9f)
-                val msg = if (isThc) getString(R.string.thc_subtracted) else getString(R.string.cbd_subtracted)
-                showFeedback(msg, true)
-                dialog.dismiss()
-            }
-
-            dialogView.findViewById<View>(R.id.chip_keep_note).setOnClickListener {
-                if (isThc) thcCount-- else cbdCount--
-                updateDisplay()
-                // NO borramos la nota, solo restamos el contador
-                saveData()
-                animateCounter(0.9f)
-                showFeedback("Restado -1 (nota mantenida)", true)
-                dialog.dismiss()
-            }
-
-            dialogView.findViewById<View>(R.id.chip_cancel).setOnClickListener {
-                dialog.dismiss()
-            }
-
-            // Mostrar con fondo transparente para que se vea bien el card
-            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-            dialog.show()
-        } else {
-            val substance = if (isThc) "THC" else "CBD"
-            showFeedback("No hay $substance que restar", false)
+        // "-1" deshace la ÚLTIMA toma real (CBD o THC), no la del modo activo
+        if (cbdCount + thcCount <= 0) {
+            showFeedback("No hay nada que restar", false)
+            return@setOnClickListener
         }
+
+        val today = getCurrentDateKey()
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_confirm_delete, null)
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(dialogView)
+            .setCancelable(true)
+            .create()
+
+        fun applyUndo(removeNote: Boolean, feedback: String) {
+            val result = IntakeController.undoLast(this, today, removeNote)
+            if (result == null) {
+                showFeedback("No hay nada que restar", false)
+            } else {
+                cbdCount = result.cbdCount
+                thcCount = result.thcCount
+                updateDisplay()
+                saveData()
+                animateCounter(0.9f)
+                val sub = if (result.wasThc) "THC" else "CBD"
+                showFeedback("$feedback ($sub)", true)
+            }
+            dialog.dismiss()
+        }
+
+        dialogView.findViewById<View>(R.id.chip_confirm).setOnClickListener {
+            applyUndo(removeNote = true, feedback = "Restado -1")
+        }
+        dialogView.findViewById<View>(R.id.chip_keep_note).setOnClickListener {
+            applyUndo(removeNote = false, feedback = "Restado -1 (nota mantenida)")
+        }
+        dialogView.findViewById<View>(R.id.chip_cancel).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        // Mostrar con fondo transparente para que se vea bien el card
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.show()
     }
         resetButton.setOnClickListener {
             AlertDialog.Builder(this)
