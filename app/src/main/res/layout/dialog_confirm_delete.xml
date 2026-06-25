@@ -50,22 +50,11 @@
                 app:chipBackgroundColor="?attr/colorSurfaceVariant"/>
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/chip_keep_note"
-                style="@style/Widget.MaterialComponents.Chip.Action"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Solo -1 (mantener nota)"
-                app:chipIcon="@drawable/ic_edit_note"
-                android:textColor="?attr/colorPrimary"
-                app:chipBackgroundColor="?attr/colorSurfaceVariant"
-                android:layout_marginStart="8dp"/>
-
-            <com.google.android.material.chip.Chip
                 android:id="@+id/chip_confirm"
                 style="@style/Widget.MaterialComponents.Chip.Action"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sí, eliminar todo"
+                android:text="Sí, restar -1"
                 app:chipIcon="@drawable/ic_check"
                 android:textColor="?attr/colorOnError"
                 app:chipBackgroundColor="?attr/colorError"

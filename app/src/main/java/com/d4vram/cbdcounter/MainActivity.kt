@@ -556,8 +556,9 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
             .setCancelable(true)
             .create()
 
-        fun applyUndo(removeNote: Boolean, feedback: String) {
-            val result = IntakeController.undoLast(this, today, removeNote)
+        dialogView.findViewById<View>(R.id.chip_confirm).setOnClickListener {
+            // "-1" siempre borra la línea: contador y notas quedan alineados (FM1).
+            val result = IntakeController.undoLast(this, today, removeNote = true)
             if (result == null) {
                 showFeedback("No hay nada que restar", false)
             } else {
@@ -567,16 +568,9 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
                 saveData()
                 animateCounter(0.9f)
                 val sub = if (result.wasThc) "THC" else "CBD"
-                showFeedback("$feedback ($sub)", true)
+                showFeedback("Restado -1 ($sub)", true)
             }
             dialog.dismiss()
-        }
-
-        dialogView.findViewById<View>(R.id.chip_confirm).setOnClickListener {
-            applyUndo(removeNote = true, feedback = "Restado -1")
-        }
-        dialogView.findViewById<View>(R.id.chip_keep_note).setOnClickListener {
-            applyUndo(removeNote = false, feedback = "Restado -1 (nota mantenida)")
         }
         dialogView.findViewById<View>(R.id.chip_cancel).setOnClickListener {
             dialog.dismiss()
