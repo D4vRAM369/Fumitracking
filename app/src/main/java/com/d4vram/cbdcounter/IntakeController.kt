@@ -7,17 +7,44 @@ object IntakeController {
 
     enum class Substance { CBD, THC }
 
+    // Iconos de las líneas de toma. Fuente única para writer (MainActivity, widget) y
+    // parser (substanceFromEntryLine), para que no deriven y rompan undoLast.
+    const val ICON_CBD = "🔹"
+    const val ICON_THC = "🟢"
+    const val ICON_WEED = "🌿"
+    const val ICON_POLEN = "🍫"
+
     /**
      * Determina la sustancia de una línea de toma por su icono inicial. Función pura
-     * (sin Context) para poder testearla. Las infusiones (🌿 weed, 🍫 polen) y el THC
-     * estándar (🟢) cuentan como THC; el CBD estándar es 🔹.
+     * (sin Context) para poder testearla. Las infusiones (weed, polen) y el THC
+     * estándar cuentan como THC; el CBD estándar es el único CBD.
      */
     fun substanceFromEntryLine(line: String): Substance? {
         val t = line.trimStart()
         return when {
-            t.startsWith("🔹") -> Substance.CBD
-            t.startsWith("🟢") || t.startsWith("🌿") || t.startsWith("🍫") -> Substance.THC
+            t.startsWith(ICON_CBD) -> Substance.CBD
+            t.startsWith(ICON_THC) || t.startsWith(ICON_WEED) || t.startsWith(ICON_POLEN) -> Substance.THC
             else -> null
+        }
+    }
+
+    /**
+     * Decide de qué contador restar al deshacer. Pura y testeable (sin Context):
+     * si el icono de la nota lo dice, gana; si no, resta del único contador con datos,
+     * y en empate del modo activo. [detected] es lo que dio el parser sobre la última línea.
+     */
+    fun resolveUndoSubstance(
+        detected: Substance?,
+        cbdCount: Int,
+        thcCount: Int,
+        activeIsThc: Boolean
+    ): Substance = when (detected) {
+        Substance.THC -> Substance.THC
+        Substance.CBD -> Substance.CBD
+        null -> when {
+            cbdCount > 0 && thcCount == 0 -> Substance.CBD
+            thcCount > 0 && cbdCount == 0 -> Substance.THC
+            else -> if (activeIsThc) Substance.THC else Substance.CBD
         }
     }
 
@@ -31,28 +58,21 @@ object IntakeController {
     /**
      * Deshace la ÚLTIMA toma del día (no la del modo activo): detecta CBD/THC por el
      * icono de la última línea de nota, decrementa ESE contador y, si [removeNote] es
-     * true, borra esa línea. Así contador y notas quedan alineados. Devuelve null si
-     * no hay nada que restar.
+     * true, borra esa misma línea. Así contador y notas quedan alineados. Devuelve null
+     * si no hay nada que restar.
      */
     fun undoLast(context: Context, date: String, removeNote: Boolean): UndoResult? {
         val note = Prefs.getNote(context, date)
         val lastLine = note?.split("\n")?.lastOrNull { it.isNotBlank() }
-        val substance = lastLine?.let { substanceFromEntryLine(it) }
+        val detected = lastLine?.let { substanceFromEntryLine(it) }
 
-        val isThc = when (substance) {
-            Substance.THC -> true
-            Substance.CBD -> false
-            null -> {
-                // Sin pista en la nota: resta del contador que tenga algo, prefiere el activo
-                val thc = Prefs.getThcCount(context, date)
-                val cbd = Prefs.getCbdCount(context, date)
-                when {
-                    cbd > 0 && thc == 0 -> false
-                    thc > 0 && cbd == 0 -> true
-                    else -> Prefs.getSubstanceType(context) == "THC"
-                }
-            }
-        }
+        val substance = resolveUndoSubstance(
+            detected,
+            Prefs.getCbdCount(context, date),
+            Prefs.getThcCount(context, date),
+            Prefs.getSubstanceType(context) == "THC"
+        )
+        val isThc = substance == Substance.THC
 
         val current = if (isThc) Prefs.getThcCount(context, date) else Prefs.getCbdCount(context, date)
         if (current <= 0) return null
@@ -61,7 +81,7 @@ object IntakeController {
         else Prefs.setCbdCount(context, date, current - 1)
 
         var removed = false
-        if (removeNote && substance != null) {
+        if (removeNote && detected != null) {
             removeLastEntry(context, date)
             removed = true
         }
@@ -100,9 +120,13 @@ object IntakeController {
         if (currentNote.isNullOrBlank()) return
 
         val lines = currentNote.split("\n").toMutableList()
-        if (lines.isNotEmpty()) lines.removeAt(lines.lastIndex)
+        // Borrar la última línea NO vacía: la misma que detecta undoLast. Saltar vacías
+        // evita desincronizar contador y nota cuando la nota termina en '\n'.
+        val idx = lines.indexOfLast { it.isNotBlank() }
+        if (idx < 0) return
+        lines.removeAt(idx)
 
-        Prefs.setNote(context, date, lines.takeIf { it.isNotEmpty() }?.joinToString("\n"))
+        Prefs.setNote(context, date, lines.takeIf { list -> list.any { it.isNotBlank() } }?.joinToString("\n"))
     }
 
     private fun appendEntry(context: Context, date: String, entry: String) {

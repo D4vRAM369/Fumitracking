@@ -240,21 +240,21 @@ private object WidgetActionHandler {
     fun addStandardCBD(context: Context) {
         val today = currentDateKey()
         val isThc = Prefs.getSubstanceType(context) == "THC"
-        val entry = if (isThc) "🟢 ${currentTimestamp()}" else "🔹 ${currentTimestamp()}"
+        val entry = if (isThc) "${IntakeController.ICON_THC} ${currentTimestamp()}" else "${IntakeController.ICON_CBD} ${currentTimestamp()}"
         IntakeController.registerActive(context, today, entry)
     }
 
     fun addWeed(context: Context) {
         // Weed siempre suma a THC, independiente del modo activo
         val today = currentDateKey()
-        val entry = "🌿 ${currentTimestamp()} (aliñado con weed)"
+        val entry = "${IntakeController.ICON_WEED} ${currentTimestamp()} (aliñado con weed)"
         IntakeController.registerThc(context, today, entry)
     }
 
     fun addPolem(context: Context) {
         // Polen siempre suma a THC, independiente del modo activo
         val today = currentDateKey()
-        val entry = "🍫 ${currentTimestamp()} (aliñado con polen)"
+        val entry = "${IntakeController.ICON_POLEN} ${currentTimestamp()} (aliñado con polen)"
         IntakeController.registerThc(context, today, entry)
     }
 

@@ -141,8 +141,8 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
         @param:StringRes val feedbackRes: Int,
         val icon: String
     ) {
-        WEED(R.string.weed_option, R.string.cbd_infused_added_weed, "🌿"),
-        POLEM(R.string.polem_option, R.string.cbd_infused_added_polem, "🍫")
+        WEED(R.string.weed_option, R.string.cbd_infused_added_weed, IntakeController.ICON_WEED),
+        POLEM(R.string.polem_option, R.string.cbd_infused_added_polem, IntakeController.ICON_POLEN)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -754,7 +754,7 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
 
     private fun registerStandardIntake() {
         val isThc = Prefs.getSubstanceType(this) == "THC"
-        val entry = if (isThc) "🟢 ${getCurrentTimestamp()}" else "🔹 ${getCurrentTimestamp()}"
+        val entry = if (isThc) "${IntakeController.ICON_THC} ${getCurrentTimestamp()}" else "${IntakeController.ICON_CBD} ${getCurrentTimestamp()}"
         val feedback = if (isThc) getString(R.string.thc_added) else getString(R.string.cbd_added)
         registerIntake(entry, feedback)
     }
