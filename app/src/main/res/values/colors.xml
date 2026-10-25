@@ -131,5 +131,6 @@
     <color name="ring_cbd">#2E7D32</color>
     <color name="ring_thc">#B45309</color>
     <color name="ring_limit">#C2410C</color>
+    <color name="ring_on">#FFFFFF</color>
     <color name="ring_over">#DC2626</color>
 </resources>

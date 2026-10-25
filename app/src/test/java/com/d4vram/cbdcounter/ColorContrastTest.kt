@@ -16,7 +16,7 @@ class ColorContrastTest {
     private val night = File("src/main/res/values-night/colors.xml")
 
     private val ringRoles = listOf("ring_cbd", "ring_thc", "ring_limit", "ring_over")
-    private val allRoles = listOf("main_bg", "ring_track") + ringRoles
+    private val allRoles = listOf("main_bg", "ring_track", "ring_on") + ringRoles
 
     private fun colors(file: File): Map<String, Int> =
         Regex("""<color name="(\w+)">#([0-9A-Fa-f]{6})</color>""")
@@ -63,6 +63,17 @@ class ColorContrastTest {
             val c = colors(file)
             val ratio = contrast(c.getValue("ring_track"), c.getValue("main_bg"))
             assertTrue("ring_track en ${file.path} tiene contraste $ratio", ratio in 1.1..2.0)
+        }
+    }
+
+    @Test
+    fun `button text ring_on is readable on CBD and THC buttons in both themes`() {
+        for (file in listOf(light, night)) {
+            val c = colors(file)
+            for (bg in listOf("ring_cbd", "ring_thc")) {
+                val ratio = contrast(c.getValue("ring_on"), c.getValue(bg))
+                assertTrue("ring_on sobre $bg en ${file.path} tiene contraste $ratio (< 4.5)", ratio >= 4.5)
+            }
         }
     }
 }

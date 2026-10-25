@@ -207,7 +207,8 @@
             android:textSize="15sp"
             android:textAllCaps="false"
             app:cornerRadius="26dp"
-            app:backgroundTint="@color/m3_secondary" />
+            app:backgroundTint="@color/ring_thc"
+            android:textColor="@color/ring_on" />
 
         <!-- Chip Estadísticas → DashboardActivity -->
         <com.google.android.material.chip.Chip
@@ -308,7 +309,8 @@
                 android:text="@string/add_thc_label"
                 android:textAllCaps="false"
                 android:layout_marginHorizontal="8dp"
-                app:backgroundTint="@color/m3_tertiary"
+                app:backgroundTint="@color/ring_cbd"
+                android:textColor="@color/ring_on"
                 app:cornerRadius="18dp" />
 
             <com.google.android.material.button.MaterialButton
