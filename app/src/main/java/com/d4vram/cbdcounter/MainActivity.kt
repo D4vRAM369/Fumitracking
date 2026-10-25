@@ -52,6 +52,11 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
 
     private lateinit var dateText: TextView
     private lateinit var emojiText: TextView
+    private lateinit var ringsView: RingsView
+    private lateinit var ringsContainer: View
+    private lateinit var cbdLabelText: TextView
+    private lateinit var thcLabelText: TextView
+    private lateinit var ringsHintText: TextView
     private lateinit var addButton: Button
     private lateinit var addInfusedButton: MaterialButton
     private lateinit var subtractButton: Button
@@ -231,6 +236,11 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
 
         dateText = findViewById(R.id.dateText)
         emojiText = findViewById(R.id.emojiText)
+        ringsView = findViewById(R.id.ringsView)
+        ringsContainer = findViewById(R.id.ringsContainer)
+        cbdLabelText = findViewById(R.id.cbdLabelText)
+        thcLabelText = findViewById(R.id.thcLabelText)
+        ringsHintText = findViewById(R.id.ringsHintText)
         addButton = findViewById(R.id.addButton)
         addInfusedButton = findViewById(R.id.addInfusedButton)
         subtractButton = findViewById(R.id.subtractButton)
@@ -500,24 +510,49 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
         }
     }
 
+    /** Anillos, colores de los números, etiquetas y toque suave a Metas (sin metas). */
     private fun updateCounterColors() {
-        // Colores CBD según cantidad
-        val cbdColor = when {
-            cbdCount == 0 -> R.color.green_safe
-            cbdCount <= 4 -> R.color.cbd_text
-            cbdCount <= 6 -> R.color.orange_danger
-            else -> R.color.red_critical
-        }
-        cbdCountText.setTextColor(ContextCompat.getColor(this, cbdColor))
+        val goalPrefs = getSharedPreferences(GoalsActivity.PREFS_NAME, Context.MODE_PRIVATE)
+        val cbdGoal = goalPrefs.getInt(GoalsActivity.KEY_CBD_MAX, 0)
+        val thcGoal = goalPrefs.getInt(GoalsActivity.KEY_THC_MAX, 0)
+        ringsView.setProgress(cbdCount, thcCount, cbdGoal, thcGoal)
 
-        // Colores THC según cantidad
-        val thcColor = when {
-            thcCount == 0 -> R.color.green_safe
-            thcCount <= 4 -> R.color.thc_text
-            thcCount <= 6 -> R.color.orange_danger
-            else -> R.color.red_critical
+        val cbdState = RingProgress.state(cbdCount, cbdGoal)
+        val thcState = RingProgress.state(thcCount, thcGoal)
+        cbdCountText.setTextColor(ringsView.colorFor(false, cbdState))
+        thcCountText.setTextColor(ringsView.colorFor(true, thcState))
+        cbdLabelText.text = ringLabel("CBD", cbdCount, cbdGoal, cbdState)
+        thcLabelText.text = ringLabel("THC", thcCount, thcGoal, thcState)
+
+        // Toque suave: solo si falta alguna meta; nada de diálogos ni banners.
+        val anyNoGoal = cbdGoal <= 0 || thcGoal <= 0
+        ringsHintText.visibility = if (anyNoGoal) View.VISIBLE else View.GONE
+        ringsContainer.isClickable = anyNoGoal
+
+        ringsContainer.contentDescription = listOf(
+            ringDescription("CBD", cbdCount, cbdGoal, cbdState),
+            ringDescription("THC", thcCount, thcGoal, thcState)
+        ).joinToString(". ")
+    }
+
+    private fun ringLabel(name: String, count: Int, goal: Int, state: RingState): String = when (state) {
+        RingState.NO_GOAL -> name
+        RingState.UNDER -> getString(R.string.ring_label_goal, name, goal)
+        RingState.AT_LIMIT -> getString(R.string.ring_label_state, name, getString(R.string.ring_at_limit))
+        RingState.OVER -> getString(
+            R.string.ring_label_state, name, getString(R.string.ring_over_by, RingProgress.overBy(count, goal))
+        )
+    }
+
+    // Texto para TalkBack: valores y metas, y el estado en palabras (no solo en color).
+    private fun ringDescription(name: String, count: Int, goal: Int, state: RingState): String {
+        val base = if (goal > 0) getString(R.string.ring_cd_goal, name, count, goal)
+        else getString(R.string.ring_cd_no_goal, name, count)
+        return when (state) {
+            RingState.AT_LIMIT -> "$base, ${getString(R.string.ring_at_limit)}"
+            RingState.OVER -> "$base, ${getString(R.string.ring_over_by, RingProgress.overBy(count, goal))}"
+            else -> base
         }
-        thcCountText.setTextColor(ContextCompat.getColor(this, thcColor))
     }
 
     private fun getEmoji(count: Int): String = EmojiUtils.emojiForCount(count, this)
@@ -525,6 +560,9 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
     private fun setupClickListeners() {
         calendarButton.setOnClickListener {
             startActivity(Intent(this, CalendarActivity::class.java))
+        }
+        ringsContainer.setOnClickListener {
+            startActivity(Intent(this, GoalsActivity::class.java))
         }
         exportCsvIconButton.setOnClickListener { exportCsv() }
         importCsvIconButton.setOnClickListener { importCsvLauncher.launch(importMimeTypes) }

@@ -4,14 +4,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/m3_surface">
+    android:background="@color/main_bg">
 
     <!-- ====== TOP AREA ====== -->
     <FrameLayout
         android:id="@+id/topArea"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/m3_surface">
+        android:background="@color/main_bg">
 
         <!-- Top bar: título, fecha, 3 IconButtons -->
         <LinearLayout
@@ -137,80 +137,100 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Emoji grande centrado -->
-        <TextView
-            android:id="@+id/emojiText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="-60dp"
-            android:text="😌"
-            android:textSize="64sp" />
-
-        <!-- Números CBD / THC -->
+        <!-- Anillos del día: CBD (exterior) y THC (interior), emoji al centro -->
         <LinearLayout
-            android:id="@+id/dualCounterContainer"
+            android:id="@+id/ringsBlock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="60dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="104dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/cbdCountText"
+            <FrameLayout
+                android:id="@+id/ringsContainer"
+                android:layout_width="180dp"
+                android:layout_height="180dp">
+
+                <com.d4vram.cbdcounter.RingsView
+                    android:id="@+id/ringsView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:id="@+id/emojiText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="😌"
+                    android:textSize="40sp" />
+            </FrameLayout>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0"
-                android:textSize="56sp"
-                android:textStyle="bold"
-                android:textColor="@color/m3_secondary" />
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="140dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/cbdCountText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="32sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/cbdLabelText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="CBD"
+                        android:textColor="@color/m3_on_surface_variant"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="140dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/thcCountText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="32sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/thcLabelText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="THC"
+                        android:textColor="@color/m3_on_surface_variant"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
 
             <TextView
+                android:id="@+id/ringsHintText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=" / "
-                android:textSize="36sp"
-                android:textColor="@color/m3_outline" />
-
-            <TextView
-                android:id="@+id/thcCountText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0"
-                android:textSize="56sp"
-                android:textStyle="bold"
-                android:textColor="@color/m3_tertiary" />
-        </LinearLayout>
-
-        <!-- Labels CBD / THC -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="160dp"
-            android:orientation="horizontal"
-            android:gravity="center">
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="CBD"
+                android:layout_marginTop="6dp"
+                android:alpha="0.6"
+                android:text="@string/ring_set_goals_hint"
+                android:textColor="@color/m3_on_surface"
                 android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@color/m3_secondary" />
-
-            <View android:layout_width="48dp" android:layout_height="1dp" />
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="THC"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@color/m3_tertiary" />
+                android:visibility="gone" />
         </LinearLayout>
 
         <!-- TextView oculto para compatibilidad -->

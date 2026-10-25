@@ -184,4 +184,13 @@
         <item>Sábado</item>
     </string-array>
 
+
+    <!-- Anillos del día -->
+    <string name="ring_label_goal">%1$s · meta %2$d</string>
+    <string name="ring_label_state">%1$s · %2$s</string>
+    <string name="ring_at_limit">En tu límite</string>
+    <string name="ring_over_by">+%1$d sobre tu meta</string>
+    <string name="ring_set_goals_hint">Toca para fijar tus metas</string>
+    <string name="ring_cd_goal">%1$s: %2$d de %3$d</string>
+    <string name="ring_cd_no_goal">%1$s: %2$d, sin meta</string>
 </resources>
