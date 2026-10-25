@@ -80,5 +80,6 @@
     <color name="ring_cbd">#4ADE80</color>
     <color name="ring_thc">#FBBF24</color>
     <color name="ring_limit">#F97316</color>
+    <color name="ring_on">#0E1A14</color>
     <color name="ring_over">#F87171</color>
 </resources>

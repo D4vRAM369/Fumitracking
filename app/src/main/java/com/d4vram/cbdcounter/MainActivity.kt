@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
+import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
@@ -470,6 +471,16 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
         // Destacar el modo activo
         val isThc = Prefs.getSubstanceType(this) == "THC"
         highlightActiveCounter(isThc)
+
+        // Botón principal: etiqueta y color según el modo activo (antes decía "+THC" aunque sumaba CBD)
+        addButton.text = getString(if (isThc) R.string.add_thc_label else R.string.add_cbd_label)
+        addButton.backgroundTintList = ColorStateList.valueOf(
+            ContextCompat.getColor(this, if (isThc) R.color.ring_thc else R.color.ring_cbd)
+        )
+        // -1 apagado si no hay nada que deshacer (misma condición que usa su listener)
+        val hasIntakes = cbdCount + thcCount > 0
+        subtractButton.isEnabled = hasIntakes
+        subtractButton.alpha = if (hasIntakes) 1f else 0.4f
 
         // Actualizar colores según cantidad
         updateCounterColors()
