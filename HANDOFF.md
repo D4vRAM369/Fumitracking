@@ -12,7 +12,11 @@ Sesión de **brainstorming** para rediseñar la pantalla principal. Brian eligi�
 - 3 direcciones mockeadas (A anillos, B jardín, C bitácora) y 3 estados de A (vacío, normal, excedido).
 - Memoria de proyecto guardada: regla Chronicler + docs vivos.
 
-## Plan de implementación
+## ✅ ESTADO (actualizado tras la implementación)
+
+Rediseño **implementado** en la rama `feat/rings-redesign` (8 commits sobre `feat/smart-undo-button`), 35 tests en verde, verificado en emulador (claro/oscuro, 360×640 con letra 1,3). **No mergeado ni pusheado.** Pendiente de Brian: revisar, probar en móvil real y decidir el merge; probar el cambio de día con la app abierta y el widget (no verificados aquí). El cambio ajeno de racha limpia (`calculateCleanStreak`) estaba en `git stash`; se reaplicó al árbol de trabajo sin commitear.
+
+## Plan de implementación (histórico)
 
 `SPEC.md` aprobado por Brian (2026-10-25). Plan escrito: `docs/superpowers/plans/2026-10-25-rings-redesign.md` (Tasks 0–7). **Pendiente:** Brian revisa el plan, resuelve el choque de color ámbar (THC vs aviso) y elige método de ejecución (subagentes o nativo). No se ha escrito código.
 

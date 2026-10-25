@@ -10,7 +10,8 @@ Leyenda: ✅ hecho · 🔄 en curso · ⬜ pendiente
 
 ## Rediseño "Anillos del día"
 
-- 🔄 **Fase 0 — Brainstorming y diseño**: dirección A elegida; caso "sin metas" decidido; semántica "lleno = límite" decidida; widget confirmado para Fase 5; falta la duda del modo claro y aprobar `SPEC.md`
+- ✅ **Fases 1–4 implementadas** (rama `feat/rings-redesign`, sin mergear; ver `HANDOFF.md`)
+- ✅ **Fase 0 — Brainstorming y diseño (cerrada)**: dirección A elegida; caso "sin metas" decidido; semántica "lleno = límite" decidida; widget confirmado para Fase 5; falta la duda del modo claro y aprobar `SPEC.md`
 - ⬜ **Fase 1 — `RingsView`**: vista custom + tests de la lógica de progreso (fracción, exceso, sin meta)
 - ⬜ **Fase 2 — Pantalla principal**: reemplazar bloque emoji+números en `activity_main.xml`; colores/temas **claro y oscuro** (modo claro en la v1)
 - ⬜ **Fase 3 — Hoja inferior y barra superior**: botones nuevos, menú ⋯, estado del −1
