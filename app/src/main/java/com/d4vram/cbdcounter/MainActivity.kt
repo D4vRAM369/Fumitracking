@@ -19,6 +19,7 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -61,18 +62,14 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
     private lateinit var addInfusedButton: MaterialButton
     private lateinit var subtractButton: Button
     private lateinit var resetButton: Button
-    private lateinit var settingsButton: ImageButton
+    private lateinit var moreButton: ImageButton
 
     // Iconos top-right
-    private lateinit var calendarButton: ImageButton
-    private lateinit var exportCsvIconButton: ImageButton
-    private lateinit var importCsvIconButton: ImageButton
 
     // Chip estadísticas
     private lateinit var statsChip: com.google.android.material.chip.Chip
 
     // Botón toggle tema claro/oscuro
-    private lateinit var themeToggleButton: ImageButton
 
     // Views del historial mejorado
     private lateinit var historyRecyclerView: RecyclerView
@@ -245,12 +242,8 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
         addInfusedButton = findViewById(R.id.addInfusedButton)
         subtractButton = findViewById(R.id.subtractButton)
         resetButton = findViewById(R.id.resetButton)
-        settingsButton = findViewById(R.id.settingsButton)
-        calendarButton = findViewById(R.id.calendarButton)
-        exportCsvIconButton = findViewById(R.id.exportCsvIconButton)
-        importCsvIconButton = findViewById(R.id.importCsvIconButton)
+        moreButton = findViewById(R.id.moreButton)
         statsChip = findViewById(R.id.statsChip)
-        themeToggleButton = findViewById(R.id.themeToggleButton)
         updateThemeIcon()
 
         // Historial
@@ -430,10 +423,6 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
 
     private fun updateThemeIcon() {
         val isDark = isDarkModeEnabled()
-        // En oscuro → mostramos Sol (para pasar a claro); en claro → Luna (para pasar a oscuro)
-        themeToggleButton.setImageResource(
-            if (isDark) R.drawable.ic_sun else R.drawable.ic_moon
-        )
         // Ajustar iconos de barra de estado: claros en dark mode, oscuros en light mode
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.insetsController?.setSystemBarsAppearance(
@@ -555,30 +544,41 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
         }
     }
 
+    /** Menú ⋯ de la barra superior: lo que antes eran cinco iconos sueltos. */
+    private fun showMoreMenu() {
+        val popup = PopupMenu(this, moreButton)
+        popup.menuInflater.inflate(R.menu.main_more, popup.menu)
+        // En oscuro ofrecemos pasar a claro, y al revés.
+        popup.menu.findItem(R.id.action_theme).setTitle(
+            if (isDarkModeEnabled()) R.string.menu_theme_to_light else R.string.menu_theme_to_dark
+        )
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_calendar -> startActivity(Intent(this, CalendarActivity::class.java))
+                R.id.action_export -> exportCsv()
+                R.id.action_import -> importCsvLauncher.launch(importMimeTypes)
+                R.id.action_theme -> setDarkMode(!isDarkModeEnabled())
+                R.id.action_settings -> startActivity(Intent(this, SettingsActivity::class.java))
+                else -> return@setOnMenuItemClickListener false
+            }
+            true
+        }
+        popup.show()
+    }
+
     private fun getEmoji(count: Int): String = EmojiUtils.emojiForCount(count, this)
 
     private fun setupClickListeners() {
-        calendarButton.setOnClickListener {
-            startActivity(Intent(this, CalendarActivity::class.java))
-        }
         ringsContainer.setOnClickListener {
             startActivity(Intent(this, GoalsActivity::class.java))
         }
-        exportCsvIconButton.setOnClickListener { exportCsv() }
-        importCsvIconButton.setOnClickListener { importCsvLauncher.launch(importMimeTypes) }
+        moreButton.setOnClickListener { showMoreMenu() }
         statsChip.setOnClickListener { startActivity(Intent(this, DashboardActivity::class.java)) }
-        themeToggleButton.setOnClickListener {
-            setDarkMode(!isDarkModeEnabled())
-        }
 
         addButton.setOnClickListener { registerStandardIntake() }
         addInfusedButton.setOnClickListener {
             InfusionChoiceBottomSheet.new()
                 .show(supportFragmentManager, "infusion_choice")
-        }
-        settingsButton.setOnClickListener {
-            // Abrir pantalla de ajustes generales
-            startActivity(Intent(this, SettingsActivity::class.java))
         }
         subtractButton.setOnClickListener {
         // "-1" deshace la ÚLTIMA toma real (CBD o THC), no la del modo activo
