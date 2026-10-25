@@ -263,7 +263,7 @@
 
                     </com.google.android.material.chip.ChipGroup>
 
-                    <com.d4vram.cbdcounter.LineChartView
+                    <dev.d4vram.cbdcounter.LineChartView
                         android:id="@+id/lineChart"
                         android:layout_width="match_parent"
                         android:layout_height="200dp"

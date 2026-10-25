@@ -89,7 +89,7 @@
                 android:layout_width="180dp"
                 android:layout_height="180dp">
 
-                <com.d4vram.cbdcounter.RingsView
+                <dev.d4vram.cbdcounter.RingsView
                     android:id="@+id/ringsView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
