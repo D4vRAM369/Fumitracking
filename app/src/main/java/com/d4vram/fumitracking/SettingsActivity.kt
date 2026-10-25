@@ -6,6 +6,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.text.InputType
+import android.widget.CheckBox
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -49,6 +52,17 @@ class SettingsActivity : AppCompatActivity() {
                 saveFolderUri(uri.toString())
                 updateFolderDisplay(uri.toString())
                 Toast.makeText(this, getString(R.string.backup_folder_saved), Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    // Selector del archivo de backup a restaurar
+    private val restoreBackupLauncher =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            if (uri == null) return@registerForActivityResult
+            if (BackupManager.isEncrypted(this, uri)) {
+                askPassword(getString(R.string.backup_password_title_restore), warn = false) { restoreFrom(uri, it) }
+            } else {
+                restoreFrom(uri, null)
             }
         }
 
@@ -131,8 +145,73 @@ class SettingsActivity : AppCompatActivity() {
             openFolderLauncher.launch(null)
         }
 
+        val checkEncrypt = findViewById<CheckBox>(R.id.checkBackupEncrypt)
+        findViewById<MaterialButton>(R.id.btnCreateBackup).setOnClickListener {
+            if (checkEncrypt.isChecked) {
+                askPassword(getString(R.string.backup_password_title_create), warn = true) { createFullBackup(it) }
+            } else {
+                createFullBackup(null)
+            }
+        }
+        findViewById<MaterialButton>(R.id.btnRestoreBackup).setOnClickListener {
+            restoreBackupLauncher.launch(arrayOf("*/*"))
+        }
+
         btnBackupCsv.setOnClickListener    { exportCsvToSaf() }
         btnExportAudios.setOnClickListener { exportZipToSaf() }
+    }
+
+    // ============================================================
+    // Backup completo (datos + emojis + audios), cifrable
+    // ============================================================
+    private fun askPassword(title: String, warn: Boolean, onOk: (CharArray) -> Unit) {
+        val input = EditText(this).apply {
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            setPadding(64, 32, 64, 16)
+        }
+        val builder = AlertDialog.Builder(this)
+            .setTitle(title)
+            .setView(input)
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val pass = input.text.toString().toCharArray()
+                if (pass.isNotEmpty()) onOk(pass)
+            }
+        if (warn) builder.setMessage(R.string.backup_password_warning)
+        builder.show()
+    }
+
+    private fun createFullBackup(password: CharArray?) {
+        val file = BackupManager.createBackup(this, password)
+        if (file == null) {
+            Toast.makeText(this, R.string.backup_create_error, Toast.LENGTH_SHORT).show()
+            return
+        }
+        // Mismo patrón que el CSV: carpeta elegida si hay; si no, hoja de compartir
+        val folderDoc = getSafFolderDoc()
+        val saved = folderDoc?.let { folder ->
+            runCatching {
+                val mime = if (password != null) "application/octet-stream" else "application/zip"
+                val doc = folder.createFile(mime, file.name) ?: error("sin archivo")
+                contentResolver.openOutputStream(doc.uri)?.use { os -> file.inputStream().use { it.copyTo(os) } }
+            }.isSuccess
+        } ?: false
+        if (saved) {
+            Toast.makeText(this, R.string.backup_saved_folder, Toast.LENGTH_SHORT).show()
+        } else {
+            shareFile(file, if (password != null) "application/octet-stream" else "application/zip",
+                getString(R.string.backup_share_title))
+        }
+    }
+
+    private fun restoreFrom(uri: Uri, password: CharArray?) {
+        if (BackupManager.restoreBackup(this, uri, password)) {
+            Toast.makeText(this, R.string.restore_success, Toast.LENGTH_LONG).show()
+            setResult(RESULT_OK)
+            finish() // MainActivity recarga datos al volver
+        } else {
+            Toast.makeText(this, R.string.backup_restore_error, Toast.LENGTH_LONG).show()
+        }
     }
 
     // ============================================================

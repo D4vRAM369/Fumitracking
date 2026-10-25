@@ -166,6 +166,50 @@
                         android:background="@color/m3_outline"
                         android:layout_marginBottom="12dp"/>
 
+                    <!-- Backup completo (datos + emojis + audios) -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/backup_encrypt_label"
+                            android:textColor="@color/text_primary"
+                            android:textSize="14sp"/>
+
+                        <CheckBox
+                            android:id="@+id/checkBackupEncrypt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCreateBackup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/backup_create_btn"
+                        android:layout_marginBottom="8dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnRestoreBackup"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/backup_restore_btn"
+                        android:layout_marginBottom="12dp"/>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/m3_outline"
+                        android:layout_marginBottom="12dp"/>
+
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnBackupCsv"
                         android:layout_width="match_parent"

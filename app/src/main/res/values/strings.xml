@@ -78,6 +78,13 @@
     <string name="backup_success">Backup creado con éxito</string>
     <string name="restore_success">Datos restaurados correctamente</string>
     <string name="backup_password_prompt">Introduce contraseña del backup</string>
+    <string name="backup_password_title_create">Contraseña del backup</string>
+    <string name="backup_password_title_restore">Backup cifrado: introduce la contraseña</string>
+    <string name="backup_password_warning">Si la olvidas, el backup no se puede recuperar.</string>
+    <string name="backup_saved_folder">Backup guardado en la carpeta seleccionada</string>
+    <string name="backup_restore_error">No se pudo restaurar (archivo inválido o contraseña incorrecta)</string>
+    <string name="backup_create_error">Error al crear el backup</string>
+    <string name="backup_share_title">Compartir backup</string>
     <string name="settings_emoji_title">Personalizar Emojis</string>
     <string name="settings_emoji_subtitle">Toca un emoji para cambiarlo. Se actualizará en la pantalla principal y en el widget.</string>
     <string name="settings_reset_emoji">Restaurar emojis por defecto</string>
