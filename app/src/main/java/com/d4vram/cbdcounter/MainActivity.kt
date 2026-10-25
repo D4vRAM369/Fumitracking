@@ -482,8 +482,8 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
         subtractButton.isEnabled = hasIntakes
         subtractButton.alpha = if (hasIntakes) 1f else 0.4f
 
-        // Actualizar colores según cantidad
-        updateCounterColors()
+        // Anillos, colores y etiquetas según conteo y metas
+        updateCounterColors(animate)
     }
 
     private fun highlightActiveCounter(isThcActive: Boolean) {
@@ -511,11 +511,11 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
     }
 
     /** Anillos, colores de los números, etiquetas y toque suave a Metas (sin metas). */
-    private fun updateCounterColors() {
+    private fun updateCounterColors(animate: Boolean) {
         val goalPrefs = getSharedPreferences(GoalsActivity.PREFS_NAME, Context.MODE_PRIVATE)
         val cbdGoal = goalPrefs.getInt(GoalsActivity.KEY_CBD_MAX, 0)
         val thcGoal = goalPrefs.getInt(GoalsActivity.KEY_THC_MAX, 0)
-        ringsView.setProgress(cbdCount, thcCount, cbdGoal, thcGoal)
+        ringsView.setProgress(cbdCount, thcCount, cbdGoal, thcGoal, animate)
 
         val cbdState = RingProgress.state(cbdCount, cbdGoal)
         val thcState = RingProgress.state(thcCount, thcGoal)

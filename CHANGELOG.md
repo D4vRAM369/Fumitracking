@@ -7,6 +7,24 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
+## [Sin publicar] - Rediseño "Anillos del día"
+
+### ✨ Añadido
+- Pantalla principal con **dos anillos concéntricos** (CBD exterior, THC interior) que se llenan según las metas diarias
+- Estados de meta: sin meta (pista tenue + toque suave a Metas), bajo el límite, "En tu límite" y "+N sobre tu meta" (segunda vuelta fina)
+- Animación de llenado al sumar o restar
+- Menú ⋯ en la barra superior (calendario, exportar/importar CSV, tema, ajustes)
+- Descripciones accesibles (TalkBack) con valores, metas y estado
+- Roles de color para tema claro y oscuro, con test de contraste automático
+
+### 🔧 Cambiado
+- Barra superior reducida a búsqueda y menú ⋯
+- Botón principal con etiqueta según el modo activo (`+1 CBD`); antes decía "+THC" aunque sumaba CBD
+- Botón −1 desactivado cuando no hay tomas que deshacer
+- Los colores de los números dependen de las metas, no de umbrales fijos de tomas
+
+---
+
 ## [1.1.0] - 2025-11-10
 
 ### ✨ Añadido
