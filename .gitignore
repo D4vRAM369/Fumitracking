@@ -35,3 +35,7 @@ markdown/
 gradle/gradle-daemon-jvm.properties
 output-metadata.json
 Thumbs.db
+
+# Docs vivos locales
+HANDOFF.md
+ROADMAP.md
