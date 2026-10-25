@@ -76,4 +76,22 @@ class ColorContrastTest {
             }
         }
     }
+
+    private fun blend(fg: Int, bg: Int, alpha: Double): Int {
+        fun ch(shift: Int) = ((((fg shr shift) and 0xFF) * alpha + ((bg shr shift) and 0xFF) * (1 - alpha))).toInt() shl shift
+        return ch(16) or ch(8) or ch(0)
+    }
+
+    @Test
+    fun `inactive counter number is still readable in both themes`() {
+        val alpha = MainActivity.INACTIVE_COUNTER_ALPHA.toDouble()
+        for (file in listOf(light, night)) {
+            val c = colors(file)
+            for (role in ringRoles) {
+                val shown = blend(c.getValue(role), c.getValue("main_bg"), alpha)
+                val ratio = contrast(shown, c.getValue("main_bg"))
+                assertTrue("$role atenuado en ${file.path} tiene contraste $ratio (< 3.0)", ratio >= 3.0)
+            }
+        }
+    }
 }

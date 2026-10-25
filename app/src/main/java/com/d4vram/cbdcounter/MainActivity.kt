@@ -47,6 +47,11 @@ import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, VoiceNoteBottomSheet.Listener {
 
+    companion object {
+        /** Opacidad del número del contador inactivo. Un test exige que siga leyéndose (3:1). */
+        const val INACTIVE_COUNTER_ALPHA = 0.8f
+    }
+
     // Views principales
     private lateinit var counterText: TextView  // Oculto, para compatibilidad
     private lateinit var cbdCountText: TextView
@@ -491,7 +496,7 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
         val activeScale = 1.1f
         val inactiveScale = 0.9f
         val activeAlpha = 1.0f
-        val inactiveAlpha = 0.6f
+        val inactiveAlpha = INACTIVE_COUNTER_ALPHA
 
         if (isThcActive) {
             thcCountText.scaleX = activeScale
