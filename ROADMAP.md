@@ -10,20 +10,20 @@ Leyenda: ✅ hecho · 🔄 en curso · ⬜ pendiente
 
 ## Rediseño "Anillos del día"
 
-- ✅ **Fases 1–4 implementadas** (rama `feat/rings-redesign`, sin mergear; ver `HANDOFF.md`)
-- ✅ **Fase 0 — Brainstorming y diseño (cerrada)**: dirección A elegida; caso "sin metas" decidido; semántica "lleno = límite" decidida; widget confirmado para Fase 5; falta la duda del modo claro y aprobar `SPEC.md`
-- ⬜ **Fase 1 — `RingsView`**: vista custom + tests de la lógica de progreso (fracción, exceso, sin meta)
-- ⬜ **Fase 2 — Pantalla principal**: reemplazar bloque emoji+números en `activity_main.xml`; colores/temas **claro y oscuro** (modo claro en la v1)
-- ⬜ **Fase 3 — Hoja inferior y barra superior**: botones nuevos, menú ⋯, estado del −1
-- ⬜ **Fase 4 — Pulido**: animaciones de llenado, accesibilidad, revisión de contraste en ambos temas
-- ⬜ **Fase 5 — Widget a juego** (si se decide)
+- ✅ **Fase 0 — Brainstorming y diseño** (`SPEC.md` aprobado 2026-10-25)
+- ✅ **Fase 1 — `RingProgress` + `RingsView`** (lógica con tests; vista custom)
+- ✅ **Fase 2 — Pantalla principal** claro y oscuro (roles de color + test de contraste)
+- ✅ **Fase 3 — Barra superior ⋯ y hoja inferior** (botón por modo, −1 apagado sin tomas)
+- ✅ **Fase 4 — Pulido**: animación de llenado, accesibilidad, contraste; probado en 360×640 + letra 1,3
+- ⬜ **Fase 5 — Widget a juego** (fuera de la v1)
 
-Plan detallado: `docs/superpowers/plans/2026-10-25-rings-redesign.md` (Tasks 0–7 ≈ Fases 1–4). SPEC aprobado; plan pendiente de revisión.
+Rama `feat/rings-redesign` (sin mergear, ver `HANDOFF.md`). Plan: `docs/superpowers/plans/2026-10-25-rings-redesign.md`.
 
-## Antes de empezar la Fase 1
+## Pendiente antes de publicar
 
-- ⬜ Cerrar/mergear `feat/smart-undo-button` (hay cambios sin commitear en `MainActivity.kt`)
-- ⬜ Aprobación explícita de `SPEC.md` por Brian → luego `superpowers:writing-plans`
+- ⬜ Revisión y prueba en móvil real por Brian; decidir merge (`feat/smart-undo-button` → `feat/rings-redesign` → `main`)
+- ⬜ Probar cambio de día con la app abierta y el widget
+- ⬜ Decidir el color del aviso de límite si el naranja se confunde con el ámbar de THC
 
 ## Ideas futuras (sin compromiso)
 
