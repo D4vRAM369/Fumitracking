@@ -400,9 +400,16 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
 
     private fun calculateCleanStreak(): Int {
         var streak = 0
-        val sortedData = allHistoryData.sortedByDescending { it.dateObject }
-        for (item in sortedData) {
-            if (item.totalCount == 0) streak++ else break
+        val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val cal = Calendar.getInstance()
+        // Retroceder día a día desde hoy; días sin registro = día limpio
+        repeat(365) {
+            val key = formatter.format(cal.time)
+            val total = Prefs.getTotalCount(this, key)
+            if (total > 0) return streak
+            // Solo contar si hay al menos un registro anterior (evita inflar racha en app nueva)
+            if (allHistoryData.isNotEmpty() || streak > 0) streak++
+            cal.add(Calendar.DAY_OF_YEAR, -1)
         }
         return streak
     }
