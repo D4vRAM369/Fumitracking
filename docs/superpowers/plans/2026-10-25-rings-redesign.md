@@ -46,8 +46,8 @@
 ### Task 1: Lógica de progreso (`RingProgress`)
 
 **Files:**
-- Create: `app/src/main/java/dev/d4vram/cbdcounter/RingProgress.kt`
-- Test: `app/src/test/java/dev/d4vram/cbdcounter/RingProgressTest.kt`
+- Create: `app/src/main/java/com/d4vram/fumitracking/RingProgress.kt`
+- Test: `app/src/test/java/com/d4vram/fumitracking/RingProgressTest.kt`
 
 **Interfaces:**
 - Produces:
@@ -79,7 +79,7 @@
 
 **Files:**
 - Modify: `app/src/main/res/values/colors.xml`, `app/src/main/res/values-night/colors.xml`
-- Test: `app/src/test/java/dev/d4vram/cbdcounter/ColorContrastTest.kt`
+- Test: `app/src/test/java/com/d4vram/fumitracking/ColorContrastTest.kt`
 
 **Interfaces:**
 - Produces (nombres idénticos en ambos archivos): `main_bg`, `ring_track`, `ring_cbd`, `ring_thc`, `ring_limit`, `ring_over`. Además se **redefinen** los tokens de la pantalla principal `main_sheet_bg` y `main_action_tonal_bg` (solo los usa `activity_main.xml` y dos drawables; confirmar con `grep -rn "main_sheet_bg\|main_action_tonal_bg" app/src` antes de tocar).
@@ -111,7 +111,7 @@
 ### Task 3: `RingsView`
 
 **Files:**
-- Create: `app/src/main/java/dev/d4vram/cbdcounter/RingsView.kt`
+- Create: `app/src/main/java/com/d4vram/fumitracking/RingsView.kt`
 
 **Interfaces:**
 - Consumes: `RingProgress`, `RingState` (Task 1); roles de color (Task 2).
@@ -131,7 +131,7 @@
 
 **Files:**
 - Modify: `app/src/main/res/layout/activity_main.xml` (bloque central: `emojiText`, `dualCounterContainer` y las etiquetas estáticas CBD/THC; fondo raíz y `topArea` de `@color/m3_surface` a `@color/main_bg`)
-- Modify: `app/src/main/java/dev/d4vram/cbdcounter/MainActivity.kt` (`updateDisplay`, `updateCounterColors`, `onResume`)
+- Modify: `app/src/main/java/com/d4vram/fumitracking/MainActivity.kt` (`updateDisplay`, `updateCounterColors`, `onResume`)
 - Modify: `app/src/main/res/values/strings.xml`
 
 **Interfaces:**

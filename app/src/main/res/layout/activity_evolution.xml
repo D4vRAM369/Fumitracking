@@ -59,7 +59,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <dev.d4vram.cbdcounter.LineChartView
+    <com.d4vram.fumitracking.LineChartView
         android:id="@+id/lineChart"
         android:layout_width="0dp"
         android:layout_height="300dp"
