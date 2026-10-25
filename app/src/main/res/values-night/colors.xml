@@ -52,11 +52,11 @@
     <color name="m3_outline">#938F99</color>
 
     <!-- Main screen polish — DARK -->
-    <color name="main_sheet_bg">#211F26</color>
+    <color name="main_sheet_bg">#16261D</color>
     <color name="main_sheet_handle">#7D7785</color>
     <color name="main_top_icon_bg">#22FFFFFF</color>
     <color name="main_stat_tile_bg">#1FFFFFFF</color>
-    <color name="main_action_tonal_bg">#4A4458</color>
+    <color name="main_action_tonal_bg">#24402F</color>
     <color name="main_action_tonal_text">#EADDFF</color>
 
     <!-- ===== Dashboard cards — ME3 Expressive DARK ===== -->
@@ -73,4 +73,12 @@
     <color name="card_streak_bg">#2E1065</color>
     <color name="card_streak_value">#C4B5FD</color>
 
+
+    <!-- Anillos del día (pantalla principal) -->
+    <color name="main_bg">#0E1A14</color>
+    <color name="ring_track">#26382E</color>
+    <color name="ring_cbd">#4ADE80</color>
+    <color name="ring_thc">#FBBF24</color>
+    <color name="ring_limit">#F97316</color>
+    <color name="ring_over">#F87171</color>
 </resources>
