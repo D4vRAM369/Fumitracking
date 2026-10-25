@@ -99,11 +99,11 @@
     <color name="m3_outline">#79747E</color>
 
     <!-- Main screen polish — LIGHT -->
-    <color name="main_sheet_bg">#F1ECF4</color>
+    <color name="main_sheet_bg">#E8EFE6</color>
     <color name="main_sheet_handle">#9C94A4</color>
     <color name="main_top_icon_bg">#16000000</color>
     <color name="main_stat_tile_bg">#B8FFFFFF</color>
-    <color name="main_action_tonal_bg">#EADDFF</color>
+    <color name="main_action_tonal_bg">#D4E6D4</color>
     <color name="main_action_tonal_text">#21005D</color>
 
     <!-- ===== Dashboard cards — ME3 Expressive LIGHT ===== -->
@@ -124,4 +124,12 @@
     <color name="polen_amber">#FF8F00</color>
     <color name="polen_amber_container">#FFF3E0</color>
 
+
+    <!-- Anillos del día (pantalla principal) -->
+    <color name="main_bg">#F4F7F2</color>
+    <color name="ring_track">#DDE5DD</color>
+    <color name="ring_cbd">#2E7D32</color>
+    <color name="ring_thc">#B45309</color>
+    <color name="ring_limit">#C2410C</color>
+    <color name="ring_over">#DC2626</color>
 </resources>
