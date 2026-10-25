@@ -12,7 +12,7 @@ Rediseño **implementado** en la rama `feat/rings-redesign` (8 commits sobre `fe
 
 ## Paquete cambiado
 
-Nuevo paquete `dev.d4vram.cbdcounter` (namespace y applicationId). **Es otra app para Android**: la versión instalada antes (`com.d4vram.cbdcounter`, p. ej. desde APK de Releases) no se actualiza; exportar CSV/backup e importar. Ver `docs/02_ARQUITECTURA.md` D7. Faltan: actualizar los enlaces/menciones del paquete antiguo si algún sitio externo lo usa.
+Nuevo paquete `com.d4vram.fumitracking` (antes `com.d4vram.cbdcounter`) (namespace y applicationId). **Es otra app para Android**: la versión instalada antes (`com.d4vram.cbdcounter`, p. ej. desde APK de Releases) no se actualiza; exportar CSV/backup e importar. Ver `docs/02_ARQUITECTURA.md` D7. Faltan: actualizar los enlaces/menciones del paquete antiguo si algún sitio externo lo usa.
 
 ## Siguiente paso
 
