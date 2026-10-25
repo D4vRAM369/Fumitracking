@@ -1,6 +1,6 @@
 # CBDcounter2
 
-App Android personal (offline, sin cuentas) para contar tomas diarias de CBD y THC. Paquete `dev.d4vram.cbdcounter`. Kotlin + vistas XML + Material 3 (NO Compose). minSdk 24, targetSdk 35. Rama principal: `main`.
+App Android personal (offline, sin cuentas) para contar tomas diarias de CBD y THC. Paquete `com.d4vram.fumitracking`. Kotlin + vistas XML + Material 3 (NO Compose). minSdk 24, targetSdk 35. Rama principal: `main`.
 
 ## Flujo de trabajo (siempre)
 
@@ -12,7 +12,7 @@ App Android personal (offline, sin cuentas) para contar tomas diarias de CBD y T
 3. **Brainstorming antes de construir** cualquier funcionalidad o rediseño (`superpowers:brainstorming`). Nada de código de producto hasta que Brian apruebe el diseño.
 4. Mentor PBL de Brian: ver `~/.claude/CLAUDE.md` (explicar desde cero, contexto antes de código, resumen al cerrar).
 
-## Mapa del código (`app/src/main/java/dev/d4vram/cbdcounter/`)
+## Mapa del código (`app/src/main/java/com/d4vram/fumitracking/`)
 
 - `MainActivity.kt` — pantalla principal (contadores, botones, historial). El archivo más tocado.
 - `IntakeController.kt`, `HistoryRepository.kt` — lógica de tomas e historial (testeada).

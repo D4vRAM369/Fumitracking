@@ -14,11 +14,11 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "dev.d4vram.cbdcounter"
+    namespace = "com.d4vram.fumitracking"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "dev.d4vram.cbdcounter"
+        applicationId = "com.d4vram.fumitracking"
         minSdk = 26
         targetSdk = 35
         versionCode = 10

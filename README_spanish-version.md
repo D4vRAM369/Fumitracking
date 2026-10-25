@@ -105,7 +105,7 @@ Esta app no promueve el consumo de sustancias en absoluto, pero aquí va un mens
 
 ```
 app/src/main/
-├── java/dev/d4vram/cbdcounter/
+├── java/com/d4vram/fumitracking/
 │   ├── MainActivity.kt           # Contador principal + historial
 │   ├── DashboardActivity.kt      # Dashboard de estadísticas + mini gráfico
 │   ├── CalendarActivity.kt       # Calendario mensual con emojis
