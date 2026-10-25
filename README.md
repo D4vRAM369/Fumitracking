@@ -108,7 +108,7 @@ This app does not promote substance use at all, but here is a message: everybody
 
 ```
 app/src/main/
-├── java/com/d4vram/cbdcounter/
+├── java/dev/d4vram/cbdcounter/
 │   ├── MainActivity.kt           # Main counter + history
 │   ├── DashboardActivity.kt      # Stats dashboard + mini chart
 │   ├── CalendarActivity.kt       # Monthly emoji calendar
