@@ -184,4 +184,16 @@
         <item>Saturday</item>
     </string-array>
 
+
+    <!-- Daily rings -->
+    <string name="ring_label_goal">%1$s · goal %2$d</string>
+    <string name="ring_label_state">%1$s · %2$s</string>
+    <string name="ring_at_limit">At your limit</string>
+    <string name="ring_over_by">+%1$d over your goal</string>
+    <string name="ring_set_goals_hint">Tap to set your goals</string>
+    <string name="ring_cd_goal">%1$s: %2$d of %3$d</string>
+    <string name="ring_cd_no_goal">%1$s: %2$d, no goal</string>
+    <string name="content_desc_more">More options</string>
+    <string name="menu_theme_to_light">Light theme</string>
+    <string name="menu_theme_to_dark">Dark theme</string>
 </resources>

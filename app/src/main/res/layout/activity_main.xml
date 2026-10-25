@@ -47,94 +47,27 @@
                     android:textColor="@color/m3_on_surface" />
             </LinearLayout>
 
-            <!-- Iconos: dos filas compactas para reducir ruido visual -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="end">
+            <!-- Barra superior: solo búsqueda y menú ⋯ (calendario, CSV, tema y ajustes viven en el menú) -->
+            <ImageButton
+                android:id="@+id/searchButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_top_icon_button"
+                android:contentDescription="@string/content_desc_search"
+                android:padding="9dp"
+                android:src="@android:drawable/ic_menu_search"
+                android:tint="@color/m3_on_surface" />
 
-                <!-- Fila 1 horizontal: search · theme · settings -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <ImageButton
-                        android:id="@+id/searchButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="6dp"
-                        android:background="@drawable/bg_top_icon_button"
-                        android:contentDescription="@string/content_desc_search"
-                        android:padding="9dp"
-                        android:src="@android:drawable/ic_menu_search"
-                        android:tint="@color/m3_on_surface" />
-
-                    <ImageButton
-                        android:id="@+id/themeToggleButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="6dp"
-                        android:background="@drawable/bg_top_icon_button"
-                        android:contentDescription="@string/content_desc_theme_toggle"
-                        android:padding="9dp"
-                        android:src="@drawable/ic_sun"
-                        android:tint="@color/m3_on_surface" />
-
-                    <ImageButton
-                        android:id="@+id/settingsButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_top_icon_button"
-                        android:contentDescription="@string/content_desc_settings"
-                        android:padding="9dp"
-                        android:src="@android:drawable/ic_menu_manage"
-                        android:tint="@color/m3_on_surface" />
-
-                </LinearLayout>
-
-                <!-- Fila 2: calendar · export · import -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:orientation="horizontal">
-
-                    <ImageButton
-                        android:id="@+id/calendarButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="6dp"
-                        android:background="@drawable/bg_top_icon_button"
-                        android:contentDescription="@string/content_desc_calendar"
-                        android:padding="9dp"
-                        android:src="@drawable/ic_calendar"
-                        android:tint="@color/m3_on_surface" />
-
-                    <ImageButton
-                        android:id="@+id/exportCsvIconButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="6dp"
-                        android:background="@drawable/bg_top_icon_button"
-                        android:contentDescription="@string/export_csv"
-                        android:padding="9dp"
-                        android:src="@drawable/ic_csv_export"
-                        android:tint="@color/m3_on_surface" />
-
-                    <ImageButton
-                        android:id="@+id/importCsvIconButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_top_icon_button"
-                        android:contentDescription="@string/import_csv"
-                        android:padding="9dp"
-                        android:src="@drawable/ic_csv_import"
-                        android:tint="@color/m3_on_surface" />
-                </LinearLayout>
-
-            </LinearLayout>
+            <ImageButton
+                android:id="@+id/moreButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_top_icon_button"
+                android:contentDescription="@string/content_desc_more"
+                android:padding="9dp"
+                android:src="@android:drawable/ic_menu_more"
+                android:tint="@color/m3_on_surface" />
         </LinearLayout>
 
         <!-- Anillos del día: CBD (exterior) y THC (interior), emoji al centro -->
@@ -143,7 +76,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top|center_horizontal"
-            android:layout_marginTop="104dp"
+            android:layout_marginTop="100dp"
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
