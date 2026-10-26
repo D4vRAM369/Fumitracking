@@ -196,7 +196,10 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
         loadTodayData()
         updateDisplay(animate = false)
         historyAdapter.refresh()
-        
+        // Restaurar backup, importar CSV, cambiar metas o emojis alteran lo que muestra el widget
+        // sin pasar por saveData(); al volver a la app lo ponemos al día.
+        CBDWidgetProvider.updateAllWidgets(this)
+
         // Registrar receptor para cambios de fecha/hora
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_DATE_CHANGED)
