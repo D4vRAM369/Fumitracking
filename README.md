@@ -4,7 +4,7 @@
 
 <img width="512" height="512" alt="Icono de Fumitracking" src="app/src/main/ic_launcher-playstore.png" />
 
-[![Version](https://img.shields.io/badge/version-2.0.0-6750A4?style=flat-square)](https://github.com/D4vRAM369/CBDcounter/releases)
+[![Version](https://img.shields.io/badge/version-2.0.0-6750A4?style=flat-square)](https://github.com/D4vRAM369/Fumitracking/releases)
 [![Android](https://img.shields.io/badge/Android-8.0%2B-green?style=flat-square&logo=android)](https://developer.android.com)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.2-7B68EE?style=flat-square&logo=kotlin)](https://kotlinlang.org)
 [![license](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
@@ -173,8 +173,8 @@ Detalle completo en [CHANGELOG.md](CHANGELOG.md).
 ### Compilar desde el código fuente
 
 ```bash
-git clone https://github.com/D4vRAM369/CBDcounter.git
-cd CBDcounter
+git clone https://github.com/D4vRAM369/Fumitracking.git
+cd Fumitracking
 git checkout main          # versión estable
 ```
 
@@ -182,7 +182,7 @@ Abre en **Android Studio** (versión reciente, AGP 9) y ejecuta en dispositivo/e
 
 ### Releases
 
-APKs precompilados en la [página de Releases](https://github.com/D4vRAM369/CBDcounter/releases).
+APKs precompilados en la [página de Releases](https://github.com/D4vRAM369/Fumitracking/releases).
 
 ---
 
