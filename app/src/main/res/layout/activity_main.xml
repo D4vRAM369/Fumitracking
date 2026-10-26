@@ -61,7 +61,7 @@
                 android:contentDescription="@string/content_desc_search"
                 android:padding="9dp"
                 android:src="@android:drawable/ic_menu_search"
-                android:tint="@color/m3_on_surface" />
+                app:tint="@color/m3_on_surface" />
 
             <ImageButton
                 android:id="@+id/moreButton"
@@ -71,7 +71,7 @@
                 android:contentDescription="@string/content_desc_more"
                 android:padding="9dp"
                 android:src="@android:drawable/ic_menu_more"
-                android:tint="@color/m3_on_surface" />
+                app:tint="@color/m3_on_surface" />
         </LinearLayout>
 
         <!-- Anillos del día: CBD (exterior) y THC (interior), emoji al centro -->
