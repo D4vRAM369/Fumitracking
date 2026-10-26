@@ -195,7 +195,10 @@ class DayModalFragment : DialogFragment() {
             try {
                 val audioFile = VoiceNoteRepository.outputFile(requireContext(), d)
                 this.audioFile = audioFile
-                mediaRecorder = android.media.MediaRecorder(requireContext()).apply {
+                // MediaRecorder(Context) existe desde Android 12 (API 31); minSdk es 26, así que antes se usa el constructor viejo.
+                mediaRecorder = (if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S)
+                    android.media.MediaRecorder(requireContext())
+                else @Suppress("DEPRECATION") android.media.MediaRecorder()).apply {
                     setAudioSource(android.media.MediaRecorder.AudioSource.MIC)
                     setOutputFormat(android.media.MediaRecorder.OutputFormat.MPEG_4)
                     setAudioEncoder(android.media.MediaRecorder.AudioEncoder.AAC)

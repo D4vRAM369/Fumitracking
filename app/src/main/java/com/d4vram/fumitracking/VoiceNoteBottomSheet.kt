@@ -85,7 +85,10 @@ class VoiceNoteBottomSheet : BottomSheetDialogFragment() {
         }
 
         try {
-            recorder = MediaRecorder(requireContext()).apply {
+            // MediaRecorder(Context) existe desde Android 12 (API 31); minSdk es 26, así que antes se usa el constructor viejo.
+            recorder = (if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S)
+                MediaRecorder(requireContext())
+            else @Suppress("DEPRECATION") MediaRecorder()).apply {
                 setAudioSource(MediaRecorder.AudioSource.MIC)
                 setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
                 setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
