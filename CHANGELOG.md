@@ -7,9 +7,14 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
-## [Sin publicar] - Rediseño "Anillos del día"
+## [2.0.0] - 2026-10-26 - Rediseño "Anillos del día"
+
+> ⚠️ **Cambio importante:** la app ahora se llama **Fumitracking** y usa el paquete `com.d4vram.fumitracking`. Android la trata como una app **nueva**: la versión anterior (`com.d4vram.cbdcounter`) no se actualiza sola. Antes de instalar, exporta un backup o CSV en la versión vieja e impórtalo en la nueva.
 
 ### ✨ Añadido
+- **Widget rediseñado**: anillos CBD/THC con el total al centro, en tamaño compacto y ancho (se adapta al redimensionar); botones 🌿, 🍫 y `+1 CBD`/`+1 THC` según el modo activo
+- **Backup completo en Ajustes** (datos, emojis y audios en un ZIP) con **cifrado opcional AES-256**; restaurar desde el mismo sitio
+- Nombre visible **Fumitracking** e icono nuevo
 - Pantalla principal con **dos anillos concéntricos** (CBD exterior, THC interior) que se llenan según las metas diarias
 - Estados de meta: sin meta (pista tenue + toque suave a Metas), bajo el límite, "En tu límite" y "+N sobre tu meta" (segunda vuelta fina)
 - Animación de llenado al sumar o restar
@@ -18,6 +23,8 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Roles de color para tema claro y oscuro, con test de contraste automático
 
 ### 🔧 Cambiado
+- Widget: se quita el botón de reiniciar (borraba el día sin confirmar; sigue en la app, que sí pregunta)
+- Widget: se actualiza también al volver a la app tras restaurar backup, importar CSV o cambiar metas y emojis
 - Barra superior reducida a búsqueda y menú ⋯
 - Botón principal con etiqueta según el modo activo (`+1 CBD`); antes decía "+THC" aunque sumaba CBD
 - Botón −1 desactivado cuando no hay tomas que deshacer
