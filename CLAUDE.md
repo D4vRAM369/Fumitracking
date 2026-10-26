@@ -1,6 +1,6 @@
 # CBDcounter2
 
-App Android personal (offline, sin cuentas) para contar tomas diarias de CBD y THC. Paquete `com.d4vram.fumitracking`. Kotlin + vistas XML + Material 3 (NO Compose). minSdk 24, targetSdk 35. Rama principal: `main`.
+App Android personal (offline, sin cuentas) para contar tomas diarias de CBD y THC. Paquete `com.d4vram.fumitracking`. Kotlin + vistas XML + Material 3 (NO Compose). minSdk 26, targetSdk 35. Rama principal: `main`.
 
 ## Flujo de trabajo (siempre)
 
