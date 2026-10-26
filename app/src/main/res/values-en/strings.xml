@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">CBD Counter</string>
+    <string name="app_name">Fumitracking</string>
     <string name="app_name_description">🌿 CBD &amp; THC Counter</string>
     <string name="widget_description">Quick CBD and THC counter</string>
     <string name="add_button">+ 1</string>
