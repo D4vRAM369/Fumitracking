@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Botón Polen ME3 light: ámbar-marrón -->
+<!-- Botón polen: ámbar oscuro (fondo oscuro fijo del widget: sin variante night) -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="#BF5000" />
+    <solid android:color="#5C3A12" />
     <corners android:radius="14dp" />
 </shape>

@@ -1,4 +1,3 @@
-// CBDWidgetProvider.kt - CORREGIDO
 package com.d4vram.fumitracking
 
 import android.app.AlarmManager
@@ -10,6 +9,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import android.widget.RemoteViews
 import java.text.SimpleDateFormat
 import java.util.*
@@ -20,7 +20,6 @@ class CBDWidgetProvider : AppWidgetProvider() {
         const val ACTION_ADD_CBD = "com.d4vram.fumitracking.ADD_CBD"
         const val ACTION_ADD_WEED = "com.d4vram.fumitracking.ADD_WEED"
         const val ACTION_ADD_POLEM = "com.d4vram.fumitracking.ADD_POLEM"
-        const val ACTION_RESET_CBD = "com.d4vram.fumitracking.RESET_CBD"
         private const val ACTION_SCHEDULED_REFRESH = "com.d4vram.fumitracking.SCHEDULED_REFRESH"
         private const val MIDNIGHT_REQUEST_CODE = 420
 
@@ -28,11 +27,9 @@ class CBDWidgetProvider : AppWidgetProvider() {
         private const val PREFS_NAME = "CBDCounter"
         private const val KEY_COUNT_PREFIX = "count_"
 
-        // Método estático para actualizar widgets desde MainActivity
+        // Método estático para actualizar widgets desde MainActivity y desde los botones.
+        // Pinta directamente con AppWidgetManager (sin mandarse un broadcast a sí mismo).
         fun updateAllWidgets(context: Context) {
-            val intent = Intent(context, CBDWidgetProvider::class.java).apply {
-                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-            }
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val componentName = ComponentName(context, CBDWidgetProvider::class.java)
             val appWidgetIds = appWidgetManager.getAppWidgetIds(componentName)
@@ -40,10 +37,68 @@ class CBDWidgetProvider : AppWidgetProvider() {
                 cancelMidnightUpdate(context)
                 return
             }
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds)
-            context.sendBroadcast(intent)
+            for (id in appWidgetIds) render(context, appWidgetManager, id)
             scheduleMidnightUpdate(context)
         }
+
+        private fun render(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
+            val today = currentDateKey()
+            val cbdCount = Prefs.getCbdCount(context, today)
+            val thcCount = Prefs.getThcCount(context, today)
+            val totalCount = cbdCount + thcCount
+            val isThc = Prefs.getSubstanceType(context) == "THC"
+
+            // Ancho real del widget en dp; si el launcher no lo informa (0), layout compacto.
+            val widthDp = appWidgetManager.getAppWidgetOptions(appWidgetId)
+                .getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 0)
+            val wide = WidgetLayout.isWide(widthDp)
+            val views = RemoteViews(
+                context.packageName,
+                if (wide) R.layout.cbd_widget_wide else R.layout.cbd_widget
+            )
+
+            // Metas máximas; 0 = sin meta (RingProgress nunca divide entre ella).
+            val goals = context.getSharedPreferences(GoalsActivity.PREFS_NAME, Context.MODE_PRIVATE)
+            views.setImageViewBitmap(
+                R.id.widget_rings,
+                WidgetRingsRenderer.render(
+                    context, cbdCount, thcCount,
+                    goals.getInt(GoalsActivity.KEY_CBD_MAX, 0),
+                    goals.getInt(GoalsActivity.KEY_THC_MAX, 0)
+                )
+            )
+            views.setTextViewText(R.id.widget_counter, totalCount.toString())
+            views.setTextViewText(R.id.widget_date, SimpleDateFormat("dd/MM", Locale.getDefault()).format(Date()))
+            views.setTextViewText(R.id.widget_emoji, EmojiUtils.emojiForCount(totalCount, context))
+            // La etiqueta del +1 dice a qué sustancia suma (modo activo).
+            views.setTextViewText(
+                R.id.widget_add_button,
+                context.getString(if (isThc) R.string.widget_add_thc else R.string.widget_add_cbd)
+            )
+            if (wide) views.setTextViewText(R.id.widget_sub_counts, "CBD $cbdCount · THC $thcCount")
+
+            views.setOnClickPendingIntent(R.id.widget_add_button, actionIntent(context, ACTION_ADD_CBD, 0))
+            views.setOnClickPendingIntent(R.id.widget_btn_weed, actionIntent(context, ACTION_ADD_WEED, 2))
+            views.setOnClickPendingIntent(R.id.widget_btn_polem, actionIntent(context, ACTION_ADD_POLEM, 3))
+            views.setOnClickPendingIntent(
+                R.id.widget_container,
+                PendingIntent.getActivity(
+                    context, 0, Intent(context, MainActivity::class.java),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+            )
+            appWidgetManager.updateAppWidget(appWidgetId, views)
+        }
+
+        private fun actionIntent(context: Context, action: String, requestCode: Int): PendingIntent =
+            PendingIntent.getBroadcast(
+                context, requestCode,
+                Intent(context, CBDWidgetActionReceiver::class.java).apply { this.action = action },
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+        private fun currentDateKey(): String =
+            SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
 
         private fun scheduleMidnightUpdate(context: Context) {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager ?: return
@@ -91,10 +146,15 @@ class CBDWidgetProvider : AppWidgetProvider() {
     }
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        for (appWidgetId in appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId)
-        }
+        for (appWidgetId in appWidgetIds) render(context, appWidgetManager, appWidgetId)
         scheduleMidnightUpdate(context)
+    }
+
+    // Al redimensionar el widget cambia el ancho: puede tocar pasar de 2×2 a 4×2 o al revés.
+    override fun onAppWidgetOptionsChanged(
+        context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle
+    ) {
+        render(context, appWidgetManager, appWidgetId)
     }
 
     override fun onEnabled(context: Context) {
@@ -110,13 +170,7 @@ class CBDWidgetProvider : AppWidgetProvider() {
 
         runCatching {
             when (intent.action) {
-                AppWidgetManager.ACTION_APPWIDGET_UPDATE -> {
-                    val appWidgetManager = AppWidgetManager.getInstance(context)
-                    val appWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS)
-                    if (appWidgetIds != null) {
-                        onUpdate(context, appWidgetManager, appWidgetIds)
-                    }
-                }
+                // APPWIDGET_UPDATE ya lo despacha super.onReceive hacia onUpdate: no repetirlo aquí.
                 Intent.ACTION_DATE_CHANGED,
                 Intent.ACTION_TIME_CHANGED,
                 Intent.ACTION_TIMEZONE_CHANGED,
@@ -130,93 +184,6 @@ class CBDWidgetProvider : AppWidgetProvider() {
             e.printStackTrace()
         }
     }
-
-    private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
-        val views = RemoteViews(context.packageName, R.layout.cbd_widget)
-
-        // Obtener contadores actuales
-        val today = getCurrentDateKey()
-        val cbdCount = Prefs.getCbdCount(context, today)
-        val thcCount = Prefs.getThcCount(context, today)
-        val totalCount = cbdCount + thcCount
-        val date = getCurrentDateDisplay()
-        val emoji = EmojiUtils.emojiForCount(totalCount, context)
-        val isThc = Prefs.getSubstanceType(context) == "THC"
-
-        // Actualizar vistas principales
-        views.setTextViewText(R.id.widget_counter, totalCount.toString())
-        views.setTextViewText(R.id.widget_date, date)
-        views.setTextViewText(R.id.widget_emoji, emoji)
-
-        // Sub-línea CBD · THC (desglose)
-        views.setTextViewText(R.id.widget_sub_counts, "CBD $cbdCount · THC $thcCount")
-
-        // Badge modo activo
-        views.setTextViewText(R.id.widget_mode_label, if (isThc) "THC" else "CBD")
-
-        // Color del botón +1 según modo: texto púrpura en light (blanco bg), blanco en night (verde bg)
-        // No podemos detectar modo noche en RemoteViews; el color del texto se fija para modo claro
-        // ya que el bg del botón cambia vía drawable-night automáticamente.
-        // Para noche: el bg verde oscuro contrasta mejor con texto blanco.
-        val addTextColor = if (isThc) android.graphics.Color.parseColor("#7B1FA2")
-                           else android.graphics.Color.parseColor("#6750A4")
-        views.setTextColor(R.id.widget_add_button, addTextColor)
-
-        // Configurar botón +1
-        val addIntent = Intent(context, CBDWidgetActionReceiver::class.java).apply {
-            action = ACTION_ADD_CBD
-        }
-        val addPendingIntent = PendingIntent.getBroadcast(
-            context, 0, addIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        views.setOnClickPendingIntent(R.id.widget_add_button, addPendingIntent)
-
-        // Configurar botón Weed
-        val weedIntent = Intent(context, CBDWidgetActionReceiver::class.java).apply {
-            action = ACTION_ADD_WEED
-        }
-        val weedPendingIntent = PendingIntent.getBroadcast(
-            context, 2, weedIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        views.setOnClickPendingIntent(R.id.widget_btn_weed, weedPendingIntent)
-
-        // Configurar botón Polem
-        val polemIntent = Intent(context, CBDWidgetActionReceiver::class.java).apply {
-            action = ACTION_ADD_POLEM
-        }
-        val polemPendingIntent = PendingIntent.getBroadcast(
-            context, 3, polemIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        views.setOnClickPendingIntent(R.id.widget_btn_polem, polemPendingIntent)
-
-        // Configurar botón reset
-        val resetIntent = Intent(context, CBDWidgetActionReceiver::class.java).apply {
-            action = ACTION_RESET_CBD
-        }
-        val resetPendingIntent = PendingIntent.getBroadcast(
-            context, 1, resetIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        views.setOnClickPendingIntent(R.id.widget_reset_button, resetPendingIntent)
-
-        // Configurar tap para abrir la app
-        val mainIntent = Intent(context, MainActivity::class.java)
-        val mainPendingIntent = PendingIntent.getActivity(
-            context, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        views.setOnClickPendingIntent(R.id.widget_container, mainPendingIntent)
-
-        appWidgetManager.updateAppWidget(appWidgetId, views)
-    }
-
-    private fun getCurrentDateKey(): String {
-        val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        return formatter.format(Date())
-    }
-
-    private fun getCurrentDateDisplay(): String {
-        val formatter = SimpleDateFormat("dd/MM", Locale.getDefault())
-        return formatter.format(Date())
-    }
 }
 
 class CBDWidgetActionReceiver : BroadcastReceiver() {
@@ -226,7 +193,6 @@ class CBDWidgetActionReceiver : BroadcastReceiver() {
                 CBDWidgetProvider.ACTION_ADD_CBD -> WidgetActionHandler.addStandardCBD(context)
                 CBDWidgetProvider.ACTION_ADD_WEED -> WidgetActionHandler.addWeed(context)
                 CBDWidgetProvider.ACTION_ADD_POLEM -> WidgetActionHandler.addPolem(context)
-                CBDWidgetProvider.ACTION_RESET_CBD -> WidgetActionHandler.resetActiveCounter(context)
                 else -> return
             }
             CBDWidgetProvider.updateAllWidgets(context)
@@ -256,10 +222,6 @@ private object WidgetActionHandler {
         val today = currentDateKey()
         val entry = "${IntakeController.ICON_POLEN} ${currentTimestamp()} (aliñado con polen)"
         IntakeController.registerThc(context, today, entry)
-    }
-
-    fun resetActiveCounter(context: Context) {
-        IntakeController.resetActive(context, currentDateKey())
     }
 
     private fun currentDateKey(): String =

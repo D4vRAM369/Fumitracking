@@ -3,6 +3,8 @@
     <string name="app_name_description">🌿 Contador de CBD y THC</string>
     <string name="app_name">Fumitracking</string>
     <string name="widget_description">Contador rápido de CBD y THC</string>
+    <string name="widget_add_cbd">+1 CBD</string>
+    <string name="widget_add_thc">+1 THC</string>
     <string name="add_button">+ 1</string>
     <string name="subtract_button">- 1</string>
     <string name="reset_button">REINICIAR DÍA</string>

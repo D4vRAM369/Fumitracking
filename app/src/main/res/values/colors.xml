@@ -133,4 +133,12 @@
     <color name="ring_limit">#C2410C</color>
     <color name="ring_on">#FFFFFF</color>
     <color name="ring_over">#DC2626</color>
+
+    <!-- Widget (fondo oscuro fijo, igual que el icono; THC violeta) -->
+    <color name="widget_bg">#0E0E1C</color>
+    <color name="widget_ring_track">#26263A</color>
+    <color name="widget_ring_cbd">#4ADE80</color>
+    <color name="widget_ring_thc">#A78BFA</color>
+    <color name="widget_ring_limit">#F97316</color>
+    <color name="widget_ring_over">#F87171</color>
 </resources>
