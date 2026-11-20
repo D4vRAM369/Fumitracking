@@ -190,12 +190,44 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
         showDisclaimerIfNeeded()
     }
 
-    override fun onResume() {
-        super.onResume()
-        // Actualizar emoji cuando se vuelve de EmojiSettingsActivity
+    // Vigilante de SharedPreferences: si el widget (u otra pantalla) cambia una toma, una nota o el
+    // modo mientras la app está visible, se recarga todo. Debe ser campo: Android solo guarda una
+    // referencia débil al listener y el recolector de basura lo mataría si fuese una lambda suelta.
+    private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        val relevant = key != null && (key.startsWith(Prefs.KEY_COUNT_CBD_PREFIX) ||
+            key.startsWith(Prefs.KEY_COUNT_THC_PREFIX) ||
+            key.startsWith(Prefs.KEY_NOTE_PREFIX) || key == "substance_type")
+        if (relevant) {
+            // Una toma escribe varias claves seguidas: agrupamos en una sola recarga.
+            handler.removeCallbacks(refreshRunnable)
+            handler.postDelayed(refreshRunnable, 80)
+        }
+    }
+    // Solo recarga si el disco difiere de lo mostrado: las escrituras propias de la app ya dejaron
+    // la pantalla al día (y recargar aquí cortaría sus animaciones).
+    private val refreshRunnable = Runnable {
+        val today = getCurrentDateKey()
+        if (today != loadedDateKey ||
+            Prefs.getCbdCount(this, today) != cbdCount ||
+            Prefs.getThcCount(this, today) != thcCount
+        ) refreshFromStorage()
+    }
+
+    /** Relee del disco todo lo que pinta la pantalla principal (contadores, emoji, historial, stats). */
+    private fun refreshFromStorage() {
         loadTodayData()
         updateDisplay(animate = false)
-        historyAdapter.refresh()
+        loadAllHistoryData()
+        updateHistoryView(scrollToTop = false)
+        updateStats()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Antes solo se recargaban los contadores: las tomas hechas desde el widget no salían
+        // en el historial ni en las stats hasta reiniciar la app.
+        refreshFromStorage()
+        sharedPrefs.registerOnSharedPreferenceChangeListener(prefsListener)
         // Restaurar backup, importar CSV, cambiar metas o emojis alteran lo que muestra el widget
         // sin pasar por saveData(); al volver a la app lo ponemos al día.
         CBDWidgetProvider.updateAllWidgets(this)
@@ -213,6 +245,8 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
     override fun onPause() {
         super.onPause()
         // Desregistrar receptor para evitar memory leaks
+        sharedPrefs.unregisterOnSharedPreferenceChangeListener(prefsListener)
+        handler.removeCallbacks(refreshRunnable)
         try {
             handler.removeCallbacks(midnightReloadRunnable)
             unregisterReceiver(dateChangeReceiver)
@@ -358,7 +392,7 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
         allHistoryData.addAll(HistoryRepository.loadAll(this))
     }
 
-    private fun updateHistoryView() {
+    private fun updateHistoryView(scrollToTop: Boolean = true) {
         displayedHistoryData.clear()
         val calendar = Calendar.getInstance()
 
@@ -379,7 +413,7 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
         displayedHistoryData.addAll(filteredByTab)
 
         historyAdapter.refresh()
-        if (displayedHistoryData.isNotEmpty()) {
+        if (scrollToTop && displayedHistoryData.isNotEmpty()) {
             historyRecyclerView.smoothScrollToPosition(0)
         }
     }
