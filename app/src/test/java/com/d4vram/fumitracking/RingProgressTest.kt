@@ -58,4 +58,66 @@ class RingProgressTest {
         assertEquals(RingState.UNDER, RingProgress.state(-1, 5))
         assertEquals(0f, RingProgress.fraction(-1, 5), delta)
     }
+
+    // --- Anillo fragmentado: un segmento por toma, coloreado por tipo ---
+
+    @Test
+    fun `kindsFromNote maps icons in order`() {
+        val note = "🔹 10:00\n🌿 11:00 (aliñado con weed)\n🍫 12:00\n🟢 13:00"
+        assertEquals(
+            listOf(IntakeKind.CBD, IntakeKind.WEED, IntakeKind.POLEN, IntakeKind.WEED),
+            RingProgress.kindsFromNote(note)
+        )
+    }
+
+    @Test
+    fun `kindsFromNote ignores non-intake lines`() {
+        assertEquals(listOf(IntakeKind.CBD), RingProgress.kindsFromNote("hola\n\n🔹 10:00"))
+        assertEquals(emptyList<IntakeKind>(), RingProgress.kindsFromNote(null))
+    }
+
+    @Test
+    fun `segments one per intake with goal`() {
+        val s = RingProgress.segments(listOf(IntakeKind.WEED, IntakeKind.POLEN), 2, 4, IntakeKind.WEED)
+        assertEquals(2, s.size)
+        assertEquals(IntakeKind.WEED, s[0].kind)
+        assertEquals(0f, s[0].start, delta)
+        assertEquals(0.25f, s[0].sweep, delta)
+        assertEquals(false, s[0].overflow)
+        assertEquals(IntakeKind.POLEN, s[1].kind)
+        assertEquals(0.25f, s[1].start, delta)
+        assertEquals(0.25f, s[1].sweep, delta)
+    }
+
+    @Test
+    fun `segments fills missing kinds with default`() {
+        val s = RingProgress.segments(listOf(IntakeKind.POLEN), 3, 4, IntakeKind.WEED)
+        assertEquals(listOf(IntakeKind.POLEN, IntakeKind.WEED, IntakeKind.WEED), s.map { it.kind })
+    }
+
+    @Test
+    fun `segments empty when count is zero`() {
+        assertEquals(0, RingProgress.segments(listOf(IntakeKind.CBD), 0, 5, IntakeKind.CBD).size)
+    }
+
+    @Test
+    fun `segments overflow goes to second lap`() {
+        val s = RingProgress.segments(emptyList(), 5, 4, IntakeKind.CBD)
+        assertEquals(5, s.size)
+        assertEquals(false, s[3].overflow)
+        assertEquals(true, s[4].overflow)
+        assertEquals(0f, s[4].start, delta)
+    }
+
+    @Test
+    fun `segments without goal use tenth of lap`() {
+        val s = RingProgress.segments(emptyList(), 2, 0, IntakeKind.CBD)
+        assertEquals(0.1f, s[0].sweep, delta)
+        assertEquals(0.1f, s[1].start, delta)
+    }
+
+    @Test
+    fun `segments cap at two laps`() {
+        assertEquals(20, RingProgress.segments(emptyList(), 25, 0, IntakeKind.CBD).size)
+    }
 }
