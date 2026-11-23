@@ -1,22 +1,21 @@
 package com.d4vram.fumitracking
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
-import android.animation.ValueAnimator
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
 import kotlin.math.min
 
 /**
- * Dos anillos concéntricos: CBD fuera, THC dentro. Solo dibuja; las reglas (estado,
- * relleno, exceso) viven en [RingProgress]. Los colores se leen del tema en cada dibujo,
- * así que el cambio claro/oscuro se refleja sin lógica extra.
+ * Dos anillos concéntricos: CBD fuera, THC dentro. Cada toma es un segmento con hueco,
+ * coloreado por tipo (CBD azul, weed verde, polen marrón) y en orden de hora.
+ * Solo dibuja; las reglas (segmentos, vueltas, estado) viven en [RingProgress].
+ * Los colores se leen del tema en cada dibujo, así el cambio claro/oscuro sale gratis.
  */
 class RingsView @JvmOverloads constructor(
     context: Context,
@@ -24,57 +23,42 @@ class RingsView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    private var cbd = 0
-    private var thc = 0
-    private var cbdGoal = 0
-    private var thcGoal = 0
+    private var cbdSegments: List<RingSegment> = emptyList()
+    private var thcSegments: List<RingSegment> = emptyList()
 
     // Los Paint se crean una vez: crear objetos dentro de onDraw castiga el rendimiento.
+    // BUTT (borde recto) y no ROUND: con borde redondo las puntas se comen el hueco entre tomas.
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
-        strokeCap = Paint.Cap.ROUND
+        strokeCap = Paint.Cap.BUTT
     }
     private val oval = RectF()
 
-    // Lo que se está dibujando ahora mismo (0..1). Durante la animación va del valor anterior al nuevo.
-    private var shownCbd = 0f
-    private var shownCbdOver = 0f
-    private var shownThc = 0f
-    private var shownThcOver = 0f
+    // Cuánto del anillo se ve (0..1). La animación lo lleva de 0 a 1: los segmentos "se dibujan".
+    private var reveal = 1f
     private var animator: ValueAnimator? = null
 
     /**
-     * [animate] = true interpola el llenado desde lo que se veía hasta lo nuevo (400 ms).
-     * Con false (primer dibujo, volver a la app) pinta directo. Si el sistema tiene las
-     * animaciones desactivadas, ValueAnimator ya salta al final por su cuenta.
+     * [note] es la nota del día: de ella salen el tipo y el orden de cada toma.
+     * [animate] = true redibuja los anillos girando en 400 ms. Con false pinta directo.
+     * Si el sistema tiene las animaciones desactivadas, ValueAnimator salta al final solo.
      */
-    fun setProgress(cbd: Int, thc: Int, cbdGoal: Int, thcGoal: Int, animate: Boolean = false) {
-        this.cbd = cbd
-        this.thc = thc
-        this.cbdGoal = cbdGoal
-        this.thcGoal = thcGoal
+    fun setProgress(cbd: Int, thc: Int, cbdGoal: Int, thcGoal: Int, note: String?, animate: Boolean = false) {
+        val kinds = RingProgress.kindsFromNote(note)
+        cbdSegments = RingProgress.segments(kinds.filter { it == IntakeKind.CBD }, cbd, cbdGoal, IntakeKind.CBD)
+        thcSegments = RingProgress.segments(kinds.filter { it != IntakeKind.CBD }, thc, thcGoal, IntakeKind.WEED)
 
-        val target = floatArrayOf(
-            RingProgress.fraction(cbd, cbdGoal), RingProgress.overflowFraction(cbd, cbdGoal),
-            RingProgress.fraction(thc, thcGoal), RingProgress.overflowFraction(thc, thcGoal)
-        )
         animator?.cancel()
         if (!animate || !isLaidOut) {
-            shownCbd = target[0]; shownCbdOver = target[1]
-            shownThc = target[2]; shownThcOver = target[3]
+            reveal = 1f
             invalidate()
             return
         }
-        val from = floatArrayOf(shownCbd, shownCbdOver, shownThc, shownThcOver)
         animator = ValueAnimator.ofFloat(0f, 1f).apply {
             duration = 400
             interpolator = DecelerateInterpolator()
             addUpdateListener {
-                val t = it.animatedValue as Float
-                shownCbd = from[0] + (target[0] - from[0]) * t
-                shownCbdOver = from[1] + (target[1] - from[1]) * t
-                shownThc = from[2] + (target[2] - from[2]) * t
-                shownThcOver = from[3] + (target[3] - from[3]) * t
+                reveal = it.animatedValue as Float
                 invalidate()
             }
             start()
@@ -86,13 +70,22 @@ class RingsView @JvmOverloads constructor(
         super.onDetachedFromWindow()
     }
 
-    /** Color del anillo o del número según el estado (NO_GOAL y UNDER usan el color propio). */
+    /** Color del número según el estado (NO_GOAL y UNDER usan el color propio). */
     fun colorFor(isThc: Boolean, state: RingState): Int = ContextCompat.getColor(
         context,
         when (state) {
             RingState.AT_LIMIT -> R.color.ring_limit
             RingState.OVER -> R.color.ring_over
             else -> if (isThc) R.color.ring_thc else R.color.ring_cbd
+        }
+    )
+
+    private fun colorOf(kind: IntakeKind): Int = ContextCompat.getColor(
+        context,
+        when (kind) {
+            IntakeKind.CBD -> R.color.ring_seg_cbd
+            IntakeKind.WEED -> R.color.ring_seg_weed
+            IntakeKind.POLEN -> R.color.ring_seg_polen
         }
     )
 
@@ -117,36 +110,33 @@ class RingsView @JvmOverloads constructor(
         val outerRadius = center - stroke / 2f
         val innerRadius = outerRadius - stroke - gap
 
-        drawRing(canvas, center, outerRadius, stroke, cbd, cbdGoal, shownCbd, shownCbdOver, isThc = false)
-        drawRing(canvas, center, innerRadius, stroke, thc, thcGoal, shownThc, shownThcOver, isThc = true)
+        drawRing(canvas, center, outerRadius, stroke, cbdSegments)
+        drawRing(canvas, center, innerRadius, stroke, thcSegments)
     }
 
-    private fun drawRing(
-        canvas: Canvas, center: Float, radius: Float, stroke: Float,
-        count: Int, goal: Int, fraction: Float, overflowFraction: Float, isThc: Boolean
-    ) {
+    private fun drawRing(canvas: Canvas, center: Float, radius: Float, stroke: Float, segments: List<RingSegment>) {
         oval.set(center - radius, center - radius, center + radius, center + radius)
-        paint.strokeWidth = stroke
 
-        // 1) Pista: siempre visible, es lo único que se ve si no hay meta.
+        // 1) Pista: siempre visible, es lo único que se ve sin tomas.
+        paint.strokeWidth = stroke
         paint.color = ContextCompat.getColor(context, R.color.ring_track)
         canvas.drawArc(oval, 0f, 360f, false, paint)
 
-        val state = RingProgress.state(count, goal)
-        val sweep = 360f * fraction
-        if (sweep <= 0f) return
-
-        // 2) Primera vuelta: arranca arriba (-90°) y avanza en sentido horario.
-        val color = colorFor(isThc, state)
-        paint.color = color
-        canvas.drawArc(oval, -90f, sweep, false, paint)
-
-        // 3) Segunda vuelta fina y más clara, solo si te pasas de la meta.
-        val overflow = 360f * overflowFraction
-        if (overflow > 0f) {
-            paint.strokeWidth = stroke * 0.4f
-            paint.color = ColorUtils.blendARGB(color, Color.WHITE, 0.55f)
-            canvas.drawArc(oval, -90f, overflow, false, paint)
+        // 2) Un arco por toma: arranca arriba (-90°) y avanza en sentido horario.
+        //    La segunda vuelta (te pasaste) va más fina, encima de la primera.
+        for (seg in segments) {
+            val gapDeg = min(GAP_DEG, seg.sweep * 360f * 0.5f)  // con muchas tomas el hueco no se come el arco
+            val start = seg.start * 360f + gapDeg / 2f
+            val visibleEnd = reveal * 360f  // durante la animación se corta lo que aún no "ha llegado"
+            if (start >= visibleEnd) continue
+            val sweep = min(seg.sweep * 360f - gapDeg, visibleEnd - start)
+            paint.strokeWidth = if (seg.overflow) stroke * 0.4f else stroke
+            paint.color = colorOf(seg.kind)
+            canvas.drawArc(oval, -90f + start, sweep, false, paint)
         }
+    }
+
+    private companion object {
+        const val GAP_DEG = 4f  // hueco entre tomas, en grados
     }
 }

@@ -133,6 +133,11 @@
     <color name="ring_limit">#C2410C</color>
     <color name="ring_on">#FFFFFF</color>
     <color name="ring_over">#DC2626</color>
+    <!-- Segmentos del anillo por tipo de toma. Weed y polen con brillo MUY distinto
+         (no solo distinto tono): con brillo parecido no se distinguían. -->
+    <color name="ring_seg_cbd">#1D4ED8</color>
+    <color name="ring_seg_weed">#16A34A</color>
+    <color name="ring_seg_polen">#5C3317</color>
 
     <!-- Widget (fondo oscuro fijo, igual que el icono; THC violeta) -->
     <color name="widget_bg">#0E0E1C</color>

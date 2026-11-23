@@ -564,7 +564,9 @@ class MainActivity : AppCompatActivity(), InfusionChoiceBottomSheet.Listener, Vo
         val goalPrefs = getSharedPreferences(GoalsActivity.PREFS_NAME, Context.MODE_PRIVATE)
         val cbdGoal = goalPrefs.getInt(GoalsActivity.KEY_CBD_MAX, 0)
         val thcGoal = goalPrefs.getInt(GoalsActivity.KEY_THC_MAX, 0)
-        ringsView.setProgress(cbdCount, thcCount, cbdGoal, thcGoal, animate)
+        // La nota del día lleva el icono de cada toma: de ahí salen color y orden de los segmentos.
+        val todayNote = Prefs.getNote(this, getCurrentDateKey())
+        ringsView.setProgress(cbdCount, thcCount, cbdGoal, thcGoal, todayNote, animate)
 
         val cbdState = RingProgress.state(cbdCount, cbdGoal)
         val thcState = RingProgress.state(thcCount, thcGoal)

@@ -82,4 +82,9 @@
     <color name="ring_limit">#F97316</color>
     <color name="ring_on">#0E1A14</color>
     <color name="ring_over">#F87171</color>
+    <!-- Segmentos del anillo por tipo de toma. Polen crema claro vs weed verde profundo:
+         separados por brillo, no solo por tono. -->
+    <color name="ring_seg_cbd">#60A5FA</color>
+    <color name="ring_seg_weed">#16A34A</color>
+    <color name="ring_seg_polen">#F3DEC0</color>
 </resources>

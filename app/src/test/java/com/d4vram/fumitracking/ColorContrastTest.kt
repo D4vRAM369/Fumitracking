@@ -16,7 +16,9 @@ class ColorContrastTest {
     private val night = File("src/main/res/values-night/colors.xml")
 
     private val ringRoles = listOf("ring_cbd", "ring_thc", "ring_limit", "ring_over")
-    private val allRoles = listOf("main_bg", "ring_track", "ring_on") + ringRoles
+    // Colores por tipo de toma de los segmentos del anillo (CBD azul, weed verde, polen marrón).
+    private val segRoles = listOf("ring_seg_cbd", "ring_seg_weed", "ring_seg_polen")
+    private val allRoles = listOf("main_bg", "ring_track", "ring_on") + ringRoles + segRoles
 
     private fun colors(file: File): Map<String, Int> =
         Regex("""<color name="(\w+)">#([0-9A-Fa-f]{6})</color>""")
@@ -50,7 +52,7 @@ class ColorContrastTest {
     fun `ring colors reach 3 to 1 against background in both themes`() {
         for (file in listOf(light, night)) {
             val c = colors(file)
-            for (role in ringRoles) {
+            for (role in ringRoles + segRoles) {
                 val ratio = contrast(c.getValue(role), c.getValue("main_bg"))
                 assertTrue("$role en ${file.path} tiene contraste $ratio (< 3.0)", ratio >= 3.0)
             }
@@ -80,6 +82,16 @@ class ColorContrastTest {
     private fun blend(fg: Int, bg: Int, alpha: Double): Int {
         fun ch(shift: Int) = ((((fg shr shift) and 0xFF) * alpha + ((bg shr shift) and 0xFF) * (1 - alpha))).toInt() shl shift
         return ch(16) or ch(8) or ch(0)
+    }
+
+    @Test
+    fun `weed and polen segments differ in brightness in both themes`() {
+        // Con brillo parecido (antes 1,1:1) no se distinguían a simple vista.
+        for (file in listOf(light, night)) {
+            val c = colors(file)
+            val ratio = contrast(c.getValue("ring_seg_weed"), c.getValue("ring_seg_polen"))
+            assertTrue("weed vs polen en ${file.path} tiene contraste $ratio (< 2.0)", ratio >= 2.0)
+        }
     }
 
     @Test
