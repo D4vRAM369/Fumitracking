@@ -7,6 +7,19 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
+## [2.1.0] - 2026-11-23 - Anillo fragmentado
+
+### ✨ Añadido
+- **Anillo del día por tipo de toma**: cada toma es un trozo con hueco, en orden de hora. CBD en azul, weed en verde y polen en marrón (chocolate en tema claro, crema en oscuro), para ver de un vistazo qué tomaste y cuántas veces
+
+### 🔄 Cambiado
+- El aviso "En tu límite" / "+N sobre tu meta" se muestra en el número y la etiqueta; el color del anillo ahora indica el tipo de toma
+
+### 🐛 Corregido
+- La app se pone al día al volver después de sumar desde el widget (historial y estadísticas incluidos)
+
+---
+
 ## [2.0.0] - 2026-10-26 - Rediseño "Anillos del día"
 
 > ⚠️ **Cambio importante:** la app ahora se llama **Fumitracking** y usa el paquete `com.d4vram.fumitracking`. Android la trata como una app **nueva**: la versión anterior (`com.d4vram.cbdcounter`) no se actualiza sola. Antes de instalar, exporta un backup o CSV en la versión vieja e impórtalo en la nueva.
