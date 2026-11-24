@@ -142,8 +142,9 @@
     <!-- Widget (fondo oscuro fijo, igual que el icono; THC violeta) -->
     <color name="widget_bg">#0E0E1C</color>
     <color name="widget_ring_track">#26263A</color>
-    <color name="widget_ring_cbd">#4ADE80</color>
-    <color name="widget_ring_thc">#A78BFA</color>
-    <color name="widget_ring_limit">#F97316</color>
-    <color name="widget_ring_over">#F87171</color>
+    <color name="widget_ring_thc">#A78BFA</color> <!-- fondo del botón +1 -->
+    <!-- Trozos del anillo del widget por tipo; fondo siempre oscuro → paleta oscura de la app -->
+    <color name="widget_ring_seg_cbd">#60A5FA</color>
+    <color name="widget_ring_seg_weed">#16A34A</color>
+    <color name="widget_ring_seg_polen">#F3DEC0</color>
 </resources>

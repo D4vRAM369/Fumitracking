@@ -64,7 +64,8 @@ class CBDWidgetProvider : AppWidgetProvider() {
                 WidgetRingsRenderer.render(
                     context, cbdCount, thcCount,
                     goals.getInt(GoalsActivity.KEY_CBD_MAX, 0),
-                    goals.getInt(GoalsActivity.KEY_THC_MAX, 0)
+                    goals.getInt(GoalsActivity.KEY_THC_MAX, 0),
+                    Prefs.getNote(context, today)  // tipo y orden de cada toma
                 )
             )
             views.setTextViewText(R.id.widget_counter, totalCount.toString())

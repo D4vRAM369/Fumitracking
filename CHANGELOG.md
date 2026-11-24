@@ -12,10 +12,11 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 ### ✨ Añadido
 - **Anillo del día por tipo de toma**: cada toma es un trozo con hueco, en orden de hora. CBD en azul, weed en verde y polen en marrón (chocolate en tema claro, crema en oscuro), para ver de un vistazo qué tomaste y cuántas veces
 - **Anillo de cada día en el calendario**: al tocar un día se ve su anillo y el desglose 🔹 CBD · 🌿 weed · 🍫 polen con los colores del anillo
+- **Widget con el mismo anillo**: un trozo por toma con el color de su tipo, igual que en la app
 - **Calendario con anillos**: interruptor "Caras / Anillos" en la barra; en modo Anillos cada día muestra un mini anillo con el reparto por tipo y el total de tomas
 
 ### 🔄 Cambiado
-- El aviso "En tu límite" / "+N sobre tu meta" se muestra en el número y la etiqueta; el color del anillo ahora indica el tipo de toma
+- El aviso "En tu límite" / "+N sobre tu meta" se muestra en el número y la etiqueta; el color del anillo ahora indica el tipo de toma (también en el widget: ya no se vuelve naranja/rojo; pasarse de meta = segunda vuelta fina)
 
 ### 🐛 Corregido
 - La app se pone al día al volver después de sumar desde el widget (historial y estadísticas incluidos)

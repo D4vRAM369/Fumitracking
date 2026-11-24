@@ -106,4 +106,16 @@ class ColorContrastTest {
             }
         }
     }
+
+    @Test
+    fun `widget segments read on the always-dark widget background`() {
+        // El widget no cambia con el tema: sus colores viven solo en values/colors.xml.
+        val c = colors(light)
+        for (role in listOf("widget_ring_seg_cbd", "widget_ring_seg_weed", "widget_ring_seg_polen")) {
+            val ratio = contrast(c.getValue(role), c.getValue("widget_bg"))
+            assertTrue("$role tiene contraste $ratio contra widget_bg (< 3.0)", ratio >= 3.0)
+        }
+        val wp = contrast(c.getValue("widget_ring_seg_weed"), c.getValue("widget_ring_seg_polen"))
+        assertTrue("weed vs polen en el widget tiene contraste $wp (< 2.0)", wp >= 2.0)
+    }
 }
