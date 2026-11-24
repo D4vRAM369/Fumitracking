@@ -48,6 +48,17 @@ object Prefs {
         prefs(ctx).edit().putString("substance_type", type).apply()
     }
 
+    // ---- Calendario: "emoji" (caras, por defecto) o "rings" (mini anillos) ----
+    const val CALENDAR_STYLE_EMOJI = "emoji"
+    const val CALENDAR_STYLE_RINGS = "rings"
+
+    fun getCalendarStyle(ctx: Context): String =
+        prefs(ctx).getString("calendar_style", CALENDAR_STYLE_EMOJI) ?: CALENDAR_STYLE_EMOJI
+
+    fun setCalendarStyle(ctx: Context, style: String) {
+        prefs(ctx).edit().putString("calendar_style", style).apply()
+    }
+
     // ---- Contadores separados CBD/THC ----
     fun getCbdCount(ctx: Context, date: String): Int =
         prefs(ctx).getInt("${KEY_COUNT_CBD_PREFIX}$date", 0)

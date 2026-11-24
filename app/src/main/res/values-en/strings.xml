@@ -206,4 +206,10 @@
     <string name="menu_theme_to_light">Light theme</string>
     <string name="menu_theme_to_dark">Dark theme</string>
     <string name="add_cbd_label">+1 CBD</string>
+    <!-- Calendario: caras o anillos por día -->
+    <string name="calendar_style_emoji">😌 Faces</string>
+    <string name="calendar_style_rings">◎ Rings</string>
+    <string name="ring_legend_cbd">● CBD</string>
+    <string name="ring_legend_weed">● Weed</string>
+    <string name="ring_legend_polen">● Pollen</string>
 </resources>

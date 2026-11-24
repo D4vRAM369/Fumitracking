@@ -20,7 +20,46 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:navigationIcon="@drawable/ic_arrow_left"
         app:navigationIconTint="@color/white"
-        app:titleCentered="true" />
+        app:titleCentered="true">
+
+        <!-- Caras o anillos en cada día; se recuerda en Prefs (calendar_style).
+             Va en la barra (antes vacía) para no robar altura al calendario. -->
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/calendarStyleToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="12dp"
+            app:singleSelection="true"
+            app:selectionRequired="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStyleEmoji"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="40dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textColor="@color/toolbar_toggle_text"
+                app:backgroundTint="@color/toolbar_toggle_bg"
+                app:strokeColor="#99FFFFFF"
+                android:text="@string/calendar_style_emoji" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStyleRings"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="40dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textColor="@color/toolbar_toggle_text"
+                app:backgroundTint="@color/toolbar_toggle_bg"
+                app:strokeColor="#99FFFFFF"
+                android:text="@string/calendar_style_rings" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+    </com.google.android.material.appbar.MaterialToolbar>
 
     <LinearLayout
         android:id="@+id/monthNavigator"
@@ -64,6 +103,7 @@
             app:tint="@color/text_primary"
             android:src="@drawable/ic_arrow_right" />
     </LinearLayout>
+
 
     <LinearLayout
         android:id="@+id/dayHeader"
@@ -176,6 +216,7 @@
 
         <!-- Título de la leyenda -->
         <TextView
+            android:id="@+id/emojiLegendTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/legend_title"
@@ -199,7 +240,45 @@
             />
 
         <!-- Grid de 2 columnas con colores -->
+        <!-- Leyenda del modo Anillos: color = tipo de toma -->
+        <LinearLayout
+            android:id="@+id/ringLegend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/ringLegendCbd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:text="@string/ring_legend_cbd"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/ringLegendWeed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:text="@string/ring_legend_weed"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/ringLegendPolen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:text="@string/ring_legend_polen"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
         <GridLayout
+            android:id="@+id/emojiLegendGrid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:columnCount="2"

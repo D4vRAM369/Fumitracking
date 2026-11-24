@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
@@ -93,8 +94,29 @@ class CalendarActivity : AppCompatActivity(), NoteBottomSheet.Listener {
             startActivity(android.content.Intent(this, EvolutionActivity::class.java))
         }
 
+        setupStyleToggle()
         updateCalendar()
         updateLegend() // Cargar emojis dinámicamente al iniciar
+    }
+
+    /** Interruptor Caras / Anillos: se guarda en Prefs y redibuja el mes. */
+    private fun setupStyleToggle() {
+        val toggle = findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.calendarStyleToggle)
+        val useRings = Prefs.getCalendarStyle(this) == Prefs.CALENDAR_STYLE_RINGS
+        toggle.check(if (useRings) R.id.btnStyleRings else R.id.btnStyleEmoji)
+        toggle.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (!isChecked) return@addOnButtonCheckedListener  // el grupo avisa también del botón que se desmarca
+            Prefs.setCalendarStyle(
+                this,
+                if (checkedId == R.id.btnStyleRings) Prefs.CALENDAR_STYLE_RINGS else Prefs.CALENDAR_STYLE_EMOJI
+            )
+            updateCalendar()
+        }
+
+        // La leyenda de colores usa los mismos colores que el anillo
+        findViewById<TextView>(R.id.ringLegendCbd).setTextColor(ContextCompat.getColor(this, R.color.ring_seg_cbd))
+        findViewById<TextView>(R.id.ringLegendWeed).setTextColor(ContextCompat.getColor(this, R.color.ring_seg_weed))
+        findViewById<TextView>(R.id.ringLegendPolen).setTextColor(ContextCompat.getColor(this, R.color.ring_seg_polen))
     }
 
     override fun onNoteChanged(date: String) {
@@ -116,6 +138,14 @@ class CalendarActivity : AppCompatActivity(), NoteBottomSheet.Listener {
         val formattedMonth = monthFormat.format(displayCalendar.time)
             .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
         monthLabel.text = formattedMonth
+
+        // Modo Anillos: leyenda de colores en vez de la de caras (el chip de Evolución se queda)
+        val useRings = Prefs.getCalendarStyle(this) == Prefs.CALENDAR_STYLE_RINGS
+        findViewById<View>(R.id.ringLegend).visibility = if (useRings) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.emojiLegendGrid).visibility = if (useRings) View.GONE else View.VISIBLE
+        findViewById<View>(R.id.emojiLegendTitle).visibility = if (useRings) View.GONE else View.VISIBLE
+
+        calendarAdapter.useRings = useRings
         calendarAdapter.submit(buildCalendarCells())
     }
 
@@ -168,8 +198,11 @@ class CalendarActivity : AppCompatActivity(), NoteBottomSheet.Listener {
                 todayCalendar.get(Calendar.MONTH) == currentMonth &&
                 todayCalendar.get(Calendar.YEAR) == currentYear
 
-            val totalCount = Prefs.getCbdCount(this, dateKey) + Prefs.getThcCount(this, dateKey)
-            items.add(CalendarCell.Day(day, emoji, hasData, isToday, totalCount))
+            val cbd = Prefs.getCbdCount(this, dateKey)
+            val thc = Prefs.getThcCount(this, dateKey)
+            // Reparto por tipo para el mini anillo (los contadores mandan, la nota da el tipo)
+            val mix = RingProgress.dayMix(cbd, thc, RingProgress.kindsFromNote(Prefs.getNote(this, dateKey)))
+            items.add(CalendarCell.Day(day, emoji, hasData, isToday, cbd + thc, mix))
         }
 
         while (items.size % 7 != 0) {
@@ -191,7 +224,8 @@ class CalendarActivity : AppCompatActivity(), NoteBottomSheet.Listener {
             val emoji: String,
             val hasData: Boolean,
             val isToday: Boolean,
-            val totalCount: Int = 0
+            val totalCount: Int = 0,
+            val mix: DayMix = DayMix(0, 0, 0)
         ) : CalendarCell()
     }
 
@@ -201,6 +235,7 @@ class CalendarActivity : AppCompatActivity(), NoteBottomSheet.Listener {
         private val onDayClick: (String) -> Unit
     ) : RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder>() {
         private val items = mutableListOf<CalendarCell>()
+        var useRings = false  // true = mini anillos en vez de caras
 
         fun submit(data: List<CalendarCell>) {
             items.clear()
@@ -215,7 +250,7 @@ class CalendarActivity : AppCompatActivity(), NoteBottomSheet.Listener {
         }
 
         override fun onBindViewHolder(holder: CalendarViewHolder, position: Int) {
-            holder.bind(items[position], displayCalendar, dateKeyFormat, onDayClick)
+            holder.bind(items[position], displayCalendar, dateKeyFormat, onDayClick, useRings)
         }
 
         override fun getItemCount(): Int = items.size
@@ -224,8 +259,9 @@ class CalendarActivity : AppCompatActivity(), NoteBottomSheet.Listener {
             private val dayContainer: View = itemView.findViewById(R.id.dayContainer)
             private val dayNumber: TextView = itemView.findViewById(R.id.dayNumber)
             private val dayEmoji: TextView = itemView.findViewById(R.id.dayEmoji)
+            private val dayRing: DayMixRingView = itemView.findViewById(R.id.dayRing)
 
-            fun bind(cell: CalendarCell, displayCalendar: java.util.Calendar, dateKeyFormat: java.text.SimpleDateFormat, onDayClick: (String) -> Unit) {
+            fun bind(cell: CalendarCell, displayCalendar: java.util.Calendar, dateKeyFormat: java.text.SimpleDateFormat, onDayClick: (String) -> Unit, useRings: Boolean) {
                 itemView.setOnClickListener {
                     if (cell is CalendarCell.Day && cell.hasData) {
                         val calendar = java.util.Calendar.getInstance()
@@ -242,6 +278,7 @@ class CalendarActivity : AppCompatActivity(), NoteBottomSheet.Listener {
                         dayNumber.alpha = 1f
                         dayEmoji.text = ""
                         dayEmoji.visibility = View.INVISIBLE
+                        dayRing.visibility = View.GONE
                         dayContainer.background = null
                     }
                     is CalendarCell.Day -> {
@@ -252,13 +289,17 @@ class CalendarActivity : AppCompatActivity(), NoteBottomSheet.Listener {
                             cell.hasData -> 1f
                             else -> 0.45f
                         }
-                        dayEmoji.visibility = if (cell.hasData && cell.emoji.isNotBlank()) View.VISIBLE else View.INVISIBLE
+                        val showRing = useRings && cell.hasData
+                        dayEmoji.visibility = if (!useRings && cell.hasData && cell.emoji.isNotBlank()) View.VISIBLE else View.INVISIBLE
+                        dayRing.visibility = if (showRing) View.VISIBLE else View.GONE
+                        if (showRing) dayRing.setMix(cell.mix)
                         if (cell.isToday) {
                             dayContainer.background = androidx.appcompat.content.res.AppCompatResources.getDrawable(
                                 itemView.context,
                                 R.drawable.bg_calendar_today
                             )
-                        } else if (cell.hasData) {
+                        } else if (cell.hasData && !useRings) {
+                            // En modo Anillos no hay fondo de calor: su verde chocaría con el de weed
                             dayContainer.setBackgroundColor(HeatmapUtils.colorForCount(cell.totalCount))
                         } else {
                             dayContainer.background = null
