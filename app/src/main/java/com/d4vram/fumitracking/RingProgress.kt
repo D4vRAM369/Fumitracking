@@ -71,6 +71,22 @@ object RingProgress {
             )
         }
     }
+
+    /**
+     * Cuántas tomas de cada tipo hubo en un día. Los contadores mandan: de la nota solo
+     * se usan las primeras [thcCount] tomas de THC para saber cuántas fueron polen;
+     * el resto de THC (sin línea en la nota) cuenta como weed.
+     */
+    fun dayMix(cbdCount: Int, thcCount: Int, kinds: List<IntakeKind>): DayMix {
+        val thc = thcCount.coerceAtLeast(0)
+        val polen = kinds.filter { it != IntakeKind.CBD }.take(thc).count { it == IntakeKind.POLEN }
+        return DayMix(cbd = cbdCount.coerceAtLeast(0), weed = thc - polen, polen = polen)
+    }
+}
+
+/** Reparto de un día por tipo de toma. */
+data class DayMix(val cbd: Int, val weed: Int, val polen: Int) {
+    val total: Int get() = cbd + weed + polen
 }
 
 /** Qué se tomó: decide el color del segmento. */

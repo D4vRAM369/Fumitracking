@@ -120,4 +120,30 @@ class RingProgressTest {
     fun `segments cap at two laps`() {
         assertEquals(20, RingProgress.segments(emptyList(), 25, 0, IntakeKind.CBD).size)
     }
+
+    // --- Reparto de un día (mini anillo del calendario y modal del día) ---
+
+    @Test
+    fun `dayMix counts by kind`() {
+        val k = listOf(IntakeKind.CBD, IntakeKind.WEED, IntakeKind.POLEN, IntakeKind.CBD, IntakeKind.WEED)
+        assertEquals(DayMix(2, 2, 1), RingProgress.dayMix(2, 3, k))
+    }
+
+    @Test
+    fun `dayMix fills missing thc as weed`() {
+        assertEquals(DayMix(0, 2, 1), RingProgress.dayMix(0, 3, listOf(IntakeKind.POLEN)))
+    }
+
+    @Test
+    fun `dayMix trims kinds to counter`() {
+        val k = listOf(IntakeKind.POLEN, IntakeKind.WEED, IntakeKind.WEED)
+        assertEquals(DayMix(1, 0, 1), RingProgress.dayMix(1, 1, k))
+    }
+
+    @Test
+    fun `dayMix negative counts are zero`() {
+        val mix = RingProgress.dayMix(-1, 0, emptyList())
+        assertEquals(DayMix(0, 0, 0), mix)
+        assertEquals(0, mix.total)
+    }
 }

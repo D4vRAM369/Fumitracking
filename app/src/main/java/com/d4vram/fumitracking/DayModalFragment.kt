@@ -63,7 +63,6 @@ class DayModalFragment : DialogFragment() {
         val view = LayoutInflater.from(context).inflate(R.layout.dialog_day_modal, null)
 
         val modalTitle = view.findViewById<TextView>(R.id.modalTitle)
-        val takesLabel = view.findViewById<TextView>(R.id.takesLabel)
         val noteEditText = view.findViewById<TextInputEditText>(R.id.noteEditText)
         val recordAudioButton = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.recordAudioButton)
         val saveButton = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.saveButton)
@@ -84,29 +83,22 @@ class DayModalFragment : DialogFragment() {
         date?.let { d ->
             modalTitle.text = "Día: $d"
 
-            // Load count (TOTAL = CBD + THC)
-            val count = Prefs.getTotalCount(requireContext(), d)
-            takesLabel.text = "Tomas: $count"
+            // Anillo de ese día. Metas = las actuales (no se guardan metas por día).
+            val ctx = requireContext()
+            val cbd = Prefs.getCbdCount(ctx, d)
+            val thc = Prefs.getThcCount(ctx, d)
+            val goals = ctx.getSharedPreferences(GoalsActivity.PREFS_NAME, android.content.Context.MODE_PRIVATE)
+            val cbdGoal = goals.getInt(GoalsActivity.KEY_CBD_MAX, 0)
+            val thcGoal = goals.getInt(GoalsActivity.KEY_THC_MAX, 0)
+            val note = Prefs.getNote(ctx, d)
+            view.findViewById<RingsView>(R.id.ringsDayView).setProgress(cbd, thc, cbdGoal, thcGoal, note)
 
-            // Desglose por tipo (contando emojis en las notas)
-            val note = Prefs.getNote(requireContext(), d) ?: ""
-            val lines = note.split("\n").filter { it.isNotBlank() }
-            val cbdPure = lines.count { it.trim().startsWith("🔹") || it.trim().startsWith("🟢") }
-            val weedCount = lines.count { it.contains("🌿") }
-            val polenCount = lines.count { it.contains("🍫") }
-
-            val breakdown = buildList {
-                if (cbdPure > 0) add("$cbdPure 🔹")
-                if (weedCount > 0) add("$weedCount 🌿")
-                if (polenCount > 0) add("$polenCount 🍫")
-            }.joinToString("  ·  ")
-
-            if (breakdown.isNotEmpty()) {
-                breakdownLabel.text = breakdown
-                breakdownLabel.visibility = View.VISIBLE
-            } else {
-                breakdownLabel.visibility = View.GONE
-            }
+            // Desglose por tipo con el color de su trozo. Antes 🟢 contaba como CBD;
+            // ahora sale de dayMix, que lo cuenta como weed (THC), igual que el anillo.
+            val mix = RingProgress.dayMix(cbd, thc, RingProgress.kindsFromNote(note))
+            val breakdown = breakdownText(ctx, mix, cbdGoal)
+            breakdownLabel.text = breakdown
+            breakdownLabel.visibility = if (breakdown.isEmpty()) View.GONE else View.VISIBLE
 
             // Load note
             noteEditText.setText(Prefs.getNote(requireContext(), d) ?: "")
@@ -375,5 +367,25 @@ class DayModalFragment : DialogFragment() {
         stopRecording()
         mediaPlayer?.release()
         mediaPlayer = null
+    }
+
+    /** «🔹 3/5 · 🌿 2 · 🍫 1», cada parte del color de su trozo; las que valen 0 no salen. */
+    private fun breakdownText(ctx: android.content.Context, mix: DayMix, cbdGoal: Int): CharSequence {
+        val parts = buildList {
+            if (mix.cbd > 0) add((if (cbdGoal > 0) "🔹 ${mix.cbd}/$cbdGoal" else "🔹 ${mix.cbd}") to R.color.ring_seg_cbd)
+            if (mix.weed > 0) add("🌿 ${mix.weed}" to R.color.ring_seg_weed)
+            if (mix.polen > 0) add("🍫 ${mix.polen}" to R.color.ring_seg_polen)
+        }
+        val out = android.text.SpannableStringBuilder()
+        parts.forEachIndexed { i, (text, color) ->
+            if (i > 0) out.append("  ·  ")
+            val start = out.length
+            out.append(text)
+            out.setSpan(
+                android.text.style.ForegroundColorSpan(ContextCompat.getColor(ctx, color)),
+                start, out.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        return out
     }
 }
